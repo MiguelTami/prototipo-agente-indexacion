@@ -1,2 +1,6 @@
 # Auto detect text files and perform LF normalization
 * text=auto
+
+# Los .md de los lotes se hashean byte a byte: siempre con fin de línea LF.
+ejemplos/**/*.md text eol=lf
+ejemplos/**/*.json text eol=lf
