@@ -1,0 +1,35 @@
+{
+  "curso": {
+    "id": "act-mediacion-convivencia",
+    "code": "00MAESTROS_POSG_PSIEDU_Mediacion_Convivencia",
+    "name": "Mediación de la Convivencia Escolar",
+    "language": "es",
+    "description": "Curso de posgrado sobre mediación y convivencia escolar, organizado en tres retos."
+  },
+  "cursoDictado": {
+    "id": "off-412711",
+    "lmsId": "412711",
+    "name": "MA_MA_PSIEDU_Mediacion_Convivencia",
+    "term": "2022-1"
+  },
+  "resultadosAprendizaje": [
+    {
+      "id": "ra-01",
+      "code": "RA-01",
+      "name": "El estudiante evalúa el rol de la educación en la construcción de ciudadanías democráticas en el marco de la convivencia escolar.",
+      "bloomLevel": "Evaluate"
+    },
+    {
+      "id": "ra-02",
+      "code": "RA-02",
+      "name": "El estudiante analiza situaciones de convivencia escolar según su tipificación legal (Ley 1620 de 2013, Decreto 1965 de 2013).",
+      "bloomLevel": "Analyze"
+    },
+    {
+      "id": "ra-03",
+      "code": "RA-03",
+      "name": "El estudiante diseña protocolos de atención de conflictos escolares.",
+      "bloomLevel": "Create"
+    }
+  ]
+}

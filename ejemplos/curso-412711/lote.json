@@ -1,0 +1,276 @@
+{
+  "version": 1,
+  "descripcion": "Lote de ejemplo sobre el curso dictado real 412711 de Brightspace (Mediación de la Convivencia Escolar). La estructura (identificadores, títulos, módulos, orden, URLs y fechas) es real y viene del seed de learning-catalog; el contenido de los archivos es sintético porque la extracción no descargó ningún archivo.",
+  "tenant": "TEST",
+  "sourceSystem": "Lms",
+  "lms": "Brightspace",
+  "offeringId": "off-412711",
+  "archivos": [
+    {
+      "sourceIdentifier": "4542265",
+      "tituloLms": "Programa de curso",
+      "fileType": "Pdf",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831495",
+      "sourceVersion": "2021-11-27T03:46:23.990Z",
+      "modulo": "Presentación del curso",
+      "orden": 1,
+      "markdownPath": "archivos/programa-de-curso.md",
+      "core": {
+        "filename": "programa-de-curso.pdf",
+        "contentHash": "e9b6dac7f8a4f589a0016b142b053146116895cca190bfb534dc429968394621",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo con el formato del conversor PDF del core (## Página N)."
+    },
+    {
+      "sourceIdentifier": "4542266",
+      "tituloLms": "Bienvenida al curso",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831497",
+      "sourceVersion": "2021-11-27T03:46:52.730Z",
+      "modulo": "Presentación del curso",
+      "orden": 2,
+      "markdownPath": "archivos/bienvenida-al-curso.md",
+      "core": {
+        "filename": "bienvenida-al-curso.html",
+        "contentHash": "c4bc3167620582abca771ba750892bfc06d5e53c0d6df538a54a512a2f7e25c1",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene."
+    },
+    {
+      "sourceIdentifier": "4542267",
+      "tituloLms": "Ruta de aprendizaje",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831498",
+      "sourceVersion": "2021-11-27T03:47:57.470Z",
+      "modulo": "Presentación del curso",
+      "orden": 3,
+      "markdownPath": null,
+      "core": {
+        "filename": "ruta-de-aprendizaje.html",
+        "contentHash": "3320a1ea0b444082e368fa334b319d2eacfa17ef7063257ffc1a9f5132f7ab40",
+        "markdownStatus": "unsupported",
+        "markdownWarning": "Este tipo de archivo no se convierte a Markdown: una IA no podrá leer este documento.",
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Caso de prueba: refleja el comportamiento actual del core con un HTML (sin conversor)."
+    },
+    {
+      "sourceIdentifier": "4542268",
+      "tituloLms": "Metodología del curso",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831499",
+      "sourceVersion": "2021-11-27T03:48:44.240Z",
+      "modulo": "Presentación del curso",
+      "orden": 4,
+      "markdownPath": "archivos/metodologia-del-curso.md",
+      "core": {
+        "filename": "metodologia-del-curso.html",
+        "contentHash": "5d42541d19ae25a35d63e4ec901e54f7b1b20ffdafa00ccdc43c435205a703f1",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene. Caso de prueba: ya existe en contexto/catalogo.json, debe vincularse al elemento conocido."
+    },
+    {
+      "sourceIdentifier": "4542269",
+      "tituloLms": "Mi profesor",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831500",
+      "sourceVersion": "2021-11-27T03:49:04.190Z",
+      "modulo": "Presentación del curso",
+      "orden": 5,
+      "markdownPath": "archivos/mi-profesor.md",
+      "core": {
+        "filename": "mi-profesor.html",
+        "contentHash": "618305d3cae07d3adda6442b4cbf2402d7ca62291b4430f2252971a47e8b6b3f",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene."
+    },
+    {
+      "sourceIdentifier": "4542272",
+      "tituloLms": "Créditos del curso",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831503",
+      "sourceVersion": "2021-11-27T03:49:55.440Z",
+      "modulo": "Presentación del curso",
+      "orden": 8,
+      "markdownPath": "archivos/creditos-del-curso.md",
+      "core": {
+        "filename": "creditos-del-curso.html",
+        "contentHash": "1cb4f403649aee4857356f2ea229ba4521d6dfe88f0c398b676f2eebe9c54f00",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene. Los nombres de los autores son ficticios."
+    },
+    {
+      "sourceIdentifier": "4542273",
+      "tituloLms": "Contenido reto 1",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831504",
+      "sourceVersion": "2021-11-27T03:52:41.100Z",
+      "modulo": "Reto 1",
+      "orden": 1,
+      "markdownPath": "archivos/contenido-reto-1.md",
+      "core": {
+        "filename": "contenido-reto-1.html",
+        "contentHash": "418fe19da7e509643474c30268a1e48f8cd4a555eb6f247bdf3fa73a39373fdb",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene."
+    },
+    {
+      "sourceIdentifier": "4542279",
+      "tituloLms": "Referencias reto 1",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831511",
+      "sourceVersion": "2021-11-27T03:55:10.743Z",
+      "modulo": "Reto 1",
+      "orden": 4,
+      "markdownPath": "archivos/referencias-reto-1.md",
+      "core": {
+        "filename": "referencias-reto-1.html",
+        "contentHash": "b461f7ee1ea4d5f6201fa73b0f3d85cc033ff94b2daea81f5b991bad64f894dc",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene."
+    },
+    {
+      "sourceIdentifier": "sim-0001",
+      "tituloLms": "Programa de curso (copia)",
+      "fileType": "Pdf",
+      "sourceUrl": null,
+      "sourceVersion": null,
+      "modulo": "Reto 1",
+      "orden": 5,
+      "markdownPath": "archivos/programa-de-curso-copia-reto-1.md",
+      "core": {
+        "filename": "programa-de-curso.pdf",
+        "contentHash": "e9b6dac7f8a4f589a0016b142b053146116895cca190bfb534dc429968394621",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Caso de prueba sintético: mismo contenido que 4542265, debe dar un solo elemento con dos usos."
+    },
+    {
+      "sourceIdentifier": "4542274",
+      "tituloLms": "Contenido reto 2",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831505",
+      "sourceVersion": "2021-11-27T03:53:14.837Z",
+      "modulo": "Reto 2",
+      "orden": 1,
+      "markdownPath": "archivos/contenido-reto-2.md",
+      "core": {
+        "filename": "contenido-reto-2.html",
+        "contentHash": "6878e7a8c85e0767104064e89b2ffb00a27691e3eb4725687b38d0c1cb188129",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene."
+    },
+    {
+      "sourceIdentifier": "4542280",
+      "tituloLms": "Referencias reto 2",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831512",
+      "sourceVersion": "2021-11-27T03:55:37.070Z",
+      "modulo": "Reto 2",
+      "orden": 4,
+      "markdownPath": "archivos/referencias-reto-2.md",
+      "core": {
+        "filename": "referencias-reto-2.html",
+        "contentHash": "eaec5471f2823c5f1fa221845d8d37e86d0c4110ecbc107e3525cf65f5cd3f3c",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene."
+    },
+    {
+      "sourceIdentifier": "sim-0002",
+      "tituloLms": "Lectura escaneada reto 2",
+      "fileType": "Pdf",
+      "sourceUrl": null,
+      "sourceVersion": null,
+      "modulo": "Reto 2",
+      "orden": 5,
+      "markdownPath": "archivos/lectura-escaneada-reto-2.md",
+      "core": {
+        "filename": "lectura-escaneada-reto-2.pdf",
+        "contentHash": "1f53b818784d64f350ceee78af476437533823da3b87ba8922bcd9fce47fbde2",
+        "markdownStatus": "ok",
+        "markdownWarning": null,
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Caso de prueba sintético: PDF escaneado; el core lo convierte pero sin texto útil, debe salir ilegible."
+    },
+    {
+      "sourceIdentifier": "4542275",
+      "tituloLms": "Contenido reto 3",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831506",
+      "sourceVersion": "2021-11-27T03:53:36.280Z",
+      "modulo": "Reto 3",
+      "orden": 1,
+      "markdownPath": "archivos/contenido-reto-3.md",
+      "core": {
+        "filename": "contenido-reto-3.html",
+        "contentHash": "27e8c435ece233bb7ca2e2493df07952968cd56569364ebba7dcdccc51d1f7a5",
+        "markdownStatus": "ok",
+        "markdownWarning": "El contenido superó el tope de caracteres y se truncó.",
+        "markdownTruncated": true
+      },
+      "sintetico": true,
+      "notaSimulacion": "Contenido escrito para el prototipo. Supone un conversor HTML que el core todavía no tiene. Caso de prueba: marcado como truncado por el core; se procesa con advertencia."
+    },
+    {
+      "sourceIdentifier": "4542281",
+      "tituloLms": "Referencias reto 3",
+      "fileType": "Other",
+      "sourceUrl": "https://ids.brightspace.com/activities/contenttopic/ucc-1831513",
+      "sourceVersion": "2021-11-27T03:56:10.373Z",
+      "modulo": "Reto 3",
+      "orden": 4,
+      "markdownPath": null,
+      "core": {
+        "filename": "referencias-reto-3.html",
+        "contentHash": "d4f022315c235b15aea94add14faa7b461c776b757540bbf54155e6c9bf15d1c",
+        "markdownStatus": "failed",
+        "markdownWarning": "El archivo no se pudo leer (corrupto o protegido): una IA no podrá leer este documento.",
+        "markdownTruncated": false
+      },
+      "sintetico": true,
+      "notaSimulacion": "Caso de prueba: archivo corrupto, como en el seed del mod."
+    }
+  ]
+}
