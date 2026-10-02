@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "indexador-catalogo"
+version = "0.1.0"
+description = "Prototipo aislado del agente de indexación (Agente A) de Learning Catalog"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+    "pydantic>=2.6",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=8.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["indexador*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
