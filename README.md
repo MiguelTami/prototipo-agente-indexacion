@@ -21,6 +21,40 @@ python -m venv .venv
 pip install -e ".[dev]"
 ```
 
+## Uso
+
+Un único llamado procesa un lote completo y crea `salida/<runId>/`:
+
+```bash
+python -m indexador --entrada ejemplos/curso-412711 --salida salida
+```
+
+o desde Python (por ejemplo, en un notebook):
+
+```python
+from indexador import indexar
+
+resultado = indexar("ejemplos/curso-412711", "salida")
+print(resultado.reporte.totales)
+```
+
+Cada corrida escribe:
+
+```
+salida/<runId>/
+  objetos/catalog_files.json
+  objetos/learning_elements.json
+  objetos/backings.json
+  objetos/usages.json
+  objetos/provenance.json
+  markdown/
+  reporte.json
+  reporte.md
+```
+
+La configuración por defecto está en `indexador/config.yaml` (modo del LLM, umbrales, versiones).
+Se puede pasar otra con `--config`.
+
 ## Pruebas
 
 ```bash
@@ -30,8 +64,13 @@ pytest
 ## Estructura
 
 ```
-indexador/            código del agente
-  esquemas/           modelos Pydantic de entrada y salida
+indexador/
+  corrida.py          indexar(): el único punto de entrada
+  grafo.py            grafo del lote y subgrafo por contenido (LangGraph)
+  estado.py           estado de los dos grafos
+  nodos/              un módulo por nodo
+  esquemas/           modelos Pydantic de entrada, salida y reporte
+  config.yaml         configuración por defecto
 ejemplos/             lotes de ejemplo
 scripts/              utilidades para mantener los lotes
 tests/
