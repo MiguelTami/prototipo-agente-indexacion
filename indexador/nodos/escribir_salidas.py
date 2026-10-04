@@ -1,4 +1,4 @@
-"""Escribe los objetos de la corrida en salida/<runId>/objetos/ y prepara markdown/."""
+"""Escribe los objetos de la corrida en salida/<runId>/objetos/ y un markdown por elemento nuevo."""
 
 from __future__ import annotations
 
@@ -26,4 +26,8 @@ def escribir_salidas(estado: EstadoLote) -> dict:
         (carpeta / "objetos" / nombre).write_text(
             json.dumps(filas, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
         )
+    for resultado in estado.get("resultados", []):
+        if resultado.get("markdownElemento"):
+            ruta = carpeta / "markdown" / f"{resultado['learningElementId']}.md"
+            ruta.write_text(resultado["markdownElemento"], encoding="utf-8")
     return {}
