@@ -22,7 +22,7 @@ class ConfigLlm(_Base):
 
 
 class Umbrales(_Base):
-    minCaracteresUtiles: int = Field(default=200, ge=0)
+    minCaracteresUtiles: int = Field(default=100, ge=0)
 
 
 class Config(_Base):

@@ -16,4 +16,4 @@ llm:
 
 umbrales:
   # Menos caracteres útiles que esto, sin contar encabezados de página, es un archivo ilegible.
-  minCaracteresUtiles: 200
+  minCaracteresUtiles: 100
