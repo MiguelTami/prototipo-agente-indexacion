@@ -1,24 +1,27 @@
 # Prototipo del agente de indexación (Agente A)
 
 Prototipo aislado del agente que procesa los documentos del LMS y genera los objetos de
-Learning Catalog: LearningElement, Backing, Usage, CatalogFile y Provenance.
+Learning Catalog: `CatalogFile`, `LearningElement`, `Backing`, `Usage` y `Provenance`.
 
-- **Aislado:** no se conecta al LMS, al mod `learning-catalog` ni a la base de datos.
-- **Entradas y salidas en archivos:** lee una carpeta de lote y escribe una carpeta de salida.
-- **Un único llamado:** `indexar(entrada, salida)`.
+| Criterio de aceptación | Cómo lo cumple |
+| --- | --- |
+| Aislado: sin LMS, mod ni base de datos | No importa nada de `up1`; lee y escribe carpetas. Un test lo verifica |
+| Entradas y salidas en archivos | `lote.json` + contexto + `.md` del core → objetos JSON, markdown y reporte |
+| Metadata y objetos completos | Los 5 objetos del mod, con proveniencia por campo; tests contra una copia fijada del mod |
+| Gatillable desde un único llamado | `indexar(entrada, salida)` o `python -m indexador` |
 
 El plan completo vive en el documento "Agente A: plan del primer prototipo de indexación".
 
-## Requisitos
-
-- Python 3.10 o superior
-
 ## Instalación
+
+Requiere Python 3.10 o superior.
 
 ```bash
 python -m venv .venv
 # Windows: .venv\Scripts\activate    Linux/macOS: source .venv/bin/activate
-pip install -e ".[dev]"
+pip install -e ".[dev]"             # agente + pruebas
+pip install -e ".[bedrock]"         # opcional: Amazon Bedrock
+pip install -e ".[notebook]"        # opcional: JupyterLab para el notebook
 ```
 
 ## Uso
@@ -29,7 +32,7 @@ Un único llamado procesa un lote completo y crea `salida/<runId>/`:
 python -m indexador --entrada ejemplos/curso-412711 --salida salida
 ```
 
-o desde Python (por ejemplo, en un notebook):
+o desde Python:
 
 ```python
 from indexador import indexar
@@ -38,28 +41,64 @@ resultado = indexar("ejemplos/curso-412711", "salida")
 print(resultado.reporte.totales)
 ```
 
-Cada corrida escribe:
+El recorrido guiado está en `notebooks/prototipo.ipynb` (abrir con `jupyter lab`).
+
+### Qué escribe una corrida
 
 ```
 salida/<runId>/
-  objetos/catalog_files.json
-  objetos/learning_elements.json
-  objetos/backings.json
-  objetos/usages.json
-  objetos/provenance.json
-  markdown/
-  reporte.json
-  reporte.md
+  objetos/catalog_files.json       un CatalogFile por archivo, Unreadable si no se pudo leer
+  objetos/learning_elements.json   un elemento por contenido nuevo
+  objetos/backings.json            respaldos propuestos (siempre Proposed)
+  objetos/usages.json              un uso por archivo legible
+  objetos/provenance.json          de dónde sale cada campo: AiAgent o Lms
+  markdown/<elemento>.md           contenido extraído con su metadata, el que irá a S3
+  reporte.json                     para máquinas
+  reporte.md                       para personas: totales, ilegibles, razones de los respaldos
 ```
 
-La configuración por defecto está en `indexador/config.yaml` (modo del LLM, umbrales, versiones).
-Se puede pasar otra con `--config`.
+### Modo del modelo
+
+`indexador/config.yaml` trae la configuración por defecto, en modo **simulado**: heurísticas
+deterministas, sin red ni credenciales, útiles para probar el flujo pero no para juzgar la
+calidad de la metadata.
+
+Para usar Amazon Bedrock, copiar ese archivo, cambiar `llm.modo` a `"bedrock"`, poner en
+`llm.modelo` el id de un modelo que soporte tool use, tener credenciales de AWS y correr con
+`--config mi-config.yaml`. Si el modelo falla tras los reintentos, el contenido sale como
+ilegible con su motivo y la corrida sigue.
+
+## Cómo funciona
+
+```
+Grafo del lote:
+  cargar_lote → (un Send por contenido único) → procesar_contenido
+              → consolidar_lote → escribir_salidas → generar_reporte
+
+Subgrafo de un contenido:
+  revisar_legibilidad → ¿legible?
+    no → marcar_ilegible → armar_objetos
+    sí → resolver_identidad → ¿ya está en el catálogo?
+           sí → armar_objetos (solo CatalogFile y Usage)
+           no → generar_metadata → ¿metadata válida?
+                  no → marcar_ilegible → armar_objetos
+                  sí → proponer_respaldos → armar_objetos
+```
+
+- Un **contenido** es un grupo de archivos con el mismo `contentHash`: se procesa una vez y
+  genera un elemento con un uso por archivo.
+- Un archivo **ilegible** nunca es un error: sale como `CatalogFile` en estado `Unreadable` y
+  como una fila del reporte con su motivo.
+- **Nada nace validado** y ningún campo de profesor o curador se llena.
 
 ## Pruebas
 
 ```bash
 pytest
 ```
+
+Corren en modo simulado, sin red. `tests/fixtures/objetos-mod/` guarda una copia fijada de los
+objetos del mod: si el mod cambia, se reemplaza la copia y los tests dicen qué actualizar.
 
 ## Estructura
 
@@ -69,9 +108,23 @@ indexador/
   grafo.py            grafo del lote y subgrafo por contenido (LangGraph)
   estado.py           estado de los dos grafos
   nodos/              un módulo por nodo
+  legibilidad.py      reglas de legibilidad
+  objetos.py          construcción de objetos y proveniencia
+  llm.py              modelo simulado y Amazon Bedrock
+  prompts/            prompts del modelo real
   esquemas/           modelos Pydantic de entrada, salida y reporte
   config.yaml         configuración por defecto
-ejemplos/             lotes de ejemplo
+ejemplos/             lotes de ejemplo (ver su README)
+notebooks/            recorrido guiado
 scripts/              utilidades para mantener los lotes
 tests/
 ```
+
+## Límites conocidos de esta versión
+
+- La identidad se resuelve solo por hash exacto; la similitud necesita embeddings.
+- Solo respaldos del propio curso (sin `proposedWithoutUsage`).
+- Video y audio solo si llegan ya transcritos en un `.md`.
+- Los valores que pone una regla fija (por ejemplo `rights = Institution`) no tienen
+  `Provenance`: el mod no tiene un origen para ellos.
+- La razón de cada respaldo vive en el reporte, porque `Backing` no tiene un campo para ella.
