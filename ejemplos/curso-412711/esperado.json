@@ -1,0 +1,349 @@
+{
+  "version": 1,
+  "estado": "borrador",
+  "autor": "Borrador de Claude, pendiente de revisión del equipo",
+  "criterio": "Un respaldo aporta solo si el contenido desarrolla o evalúa el RA de forma directa; mencionar el tema no basta. El nivel cognitivo es el que el contenido exige o desarrolla, no el verbo más alto que mencione. Cuando un juicio es legítimamente discutible se aceptan varias respuestas o el respaldo se marca como ambiguo (aporta = null) y no cuenta.",
+  "archivos": {
+    "4542265": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Understand",
+          "Remember"
+        ],
+        "knowledgeType": [
+          "Conceptual",
+          "Factual"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "convivencia",
+          "mediación"
+        ],
+        "estimatedTimeHoras": [
+          0.25,
+          1.0
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": false
+          },
+          "RA-02": {
+            "aporta": false
+          },
+          "RA-03": {
+            "aporta": false
+          }
+        },
+        "nota": "El programa enuncia los RA pero no los desarrolla ni los evalúa: no es un respaldo."
+      }
+    },
+    "4542266": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Remember",
+          "Understand"
+        ],
+        "knowledgeType": [
+          "Conceptual",
+          "Metacognitive"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "bienvenida",
+          "convivencia"
+        ],
+        "estimatedTimeHoras": [
+          0.1,
+          0.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": false
+          },
+          "RA-02": {
+            "aporta": false
+          },
+          "RA-03": {
+            "aporta": false
+          }
+        }
+      }
+    },
+    "4542267": {
+      "estado": "ilegible"
+    },
+    "4542268": {
+      "estado": "vinculado"
+    },
+    "4542269": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Remember",
+          "Understand"
+        ],
+        "knowledgeType": [
+          "Factual"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "profesor",
+          "docente"
+        ],
+        "estimatedTimeHoras": [
+          0.1,
+          0.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": false
+          },
+          "RA-02": {
+            "aporta": false
+          },
+          "RA-03": {
+            "aporta": false
+          }
+        },
+        "nota": "Presenta al profesor: el contenido no evalúa a la persona, solo la describe."
+      }
+    },
+    "4542272": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Remember"
+        ],
+        "knowledgeType": [
+          "Factual"
+        ],
+        "language": "es",
+        "identifiedAuthors": [
+          "Ana María Restrepo Gil",
+          "Julián Ortega Pardo",
+          "Carolina Vélez Ríos"
+        ],
+        "terminosClave": [
+          "créditos",
+          "autor",
+          "producción"
+        ],
+        "estimatedTimeHoras": [
+          0.05,
+          0.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": false
+          },
+          "RA-02": {
+            "aporta": false
+          },
+          "RA-03": {
+            "aporta": false
+          }
+        }
+      }
+    },
+    "4542273": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Understand",
+          "Evaluate"
+        ],
+        "knowledgeType": [
+          "Conceptual"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "ciudadanía",
+          "ley 1620",
+          "democr"
+        ],
+        "estimatedTimeHoras": [
+          0.25,
+          1.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": true,
+            "caracteres": [
+              "Develops"
+            ]
+          },
+          "RA-02": {
+            "aporta": false
+          },
+          "RA-03": {
+            "aporta": false
+          }
+        }
+      }
+    },
+    "4542279": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Remember",
+          "Understand"
+        ],
+        "knowledgeType": [
+          "Factual"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "referencia",
+          "bibliograf",
+          "ley 1620"
+        ],
+        "estimatedTimeHoras": [
+          0.1,
+          0.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": null,
+            "nota": "Ambiguo: menciona el tema sin desarrollarlo de forma directa."
+          },
+          "RA-02": {
+            "aporta": false
+          },
+          "RA-03": {
+            "aporta": false
+          }
+        }
+      }
+    },
+    "sim-0001": {
+      "estado": "procesado",
+      "mismoElementoQue": "4542265"
+    },
+    "4542274": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Analyze",
+          "Apply"
+        ],
+        "knowledgeType": [
+          "Conceptual",
+          "Procedural"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "decreto 1965",
+          "tipific",
+          "situaciones"
+        ],
+        "estimatedTimeHoras": [
+          0.25,
+          1.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": false
+          },
+          "RA-02": {
+            "aporta": true,
+            "caracteres": [
+              "Develops"
+            ]
+          },
+          "RA-03": {
+            "aporta": null,
+            "nota": "Ambiguo: menciona el tema sin desarrollarlo de forma directa."
+          }
+        }
+      }
+    },
+    "4542280": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Remember",
+          "Understand"
+        ],
+        "knowledgeType": [
+          "Factual"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "decreto 1965",
+          "referencia",
+          "bibliograf"
+        ],
+        "estimatedTimeHoras": [
+          0.1,
+          0.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": false
+          },
+          "RA-02": {
+            "aporta": null,
+            "nota": "Ambiguo: menciona el tema sin desarrollarlo de forma directa."
+          },
+          "RA-03": {
+            "aporta": false
+          }
+        }
+      }
+    },
+    "sim-0002": {
+      "estado": "ilegible"
+    },
+    "4542275": {
+      "estado": "procesado",
+      "elemento": {
+        "cognitiveLevel": [
+          "Create",
+          "Apply"
+        ],
+        "knowledgeType": [
+          "Procedural",
+          "Conceptual"
+        ],
+        "language": "es",
+        "identifiedAuthors": [],
+        "terminosClave": [
+          "protocolo",
+          "ruta de atención",
+          "mediación"
+        ],
+        "estimatedTimeHoras": [
+          0.25,
+          1.5
+        ],
+        "respaldos": {
+          "RA-01": {
+            "aporta": false
+          },
+          "RA-02": {
+            "aporta": null,
+            "nota": "Ambiguo: menciona el tema sin desarrollarlo de forma directa."
+          },
+          "RA-03": {
+            "aporta": true,
+            "caracteres": [
+              "Develops"
+            ]
+          }
+        }
+      }
+    },
+    "4542281": {
+      "estado": "ilegible"
+    }
+  }
+}

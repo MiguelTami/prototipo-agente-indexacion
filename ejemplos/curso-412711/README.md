@@ -36,3 +36,13 @@ python scripts/actualizar_hashes.py ejemplos/curso-412711
 
 `contexto/catalogo.json` guarda el hash de `metodologia-del-curso.md`; si se edita ese archivo,
 hay que actualizarlo a mano.
+
+## Respuestas esperadas
+
+`esperado.json` dice qué debería producir el agente con cada archivo: estado, nivel cognitivo,
+tipo de conocimiento, autores, términos clave, rango de tiempo y, por cada RA, si el elemento lo
+respalda y con qué carácter. Es un **borrador** pendiente de revisión del equipo: cuando se
+revise, cambiar `estado` a `"revisado"`.
+
+Se usa con `python -m indexador ... --evaluar` para medir el acuerdo por campo entre el agente
+y estas respuestas.
