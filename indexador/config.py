@@ -19,6 +19,9 @@ class ConfigLlm(_Base):
     modo: Literal["simulado", "bedrock"] = "simulado"
     modelo: Optional[str] = None
     region: str = "sa-east-1"
+    temperatura: float = Field(default=0.0, ge=0, le=1)
+    reintentos: int = Field(default=2, ge=0, description="Reintentos además del primer intento.")
+    maxCaracteresEntrada: int = Field(default=60_000, gt=0)
 
 
 class Umbrales(_Base):

@@ -11,8 +11,14 @@ llm:
   # "simulado": modelo falso y determinista, sin red ni credenciales (pruebas).
   # "bedrock": Amazon Bedrock, el mismo proveedor que usa Yupi.
   modo: "simulado"
+  # Id del modelo en Bedrock, obligatorio en modo "bedrock". Debe soportar tool use.
   modelo: null
   region: "sa-east-1"
+  temperatura: 0.0
+  # Reintentos además del primer intento; si se agotan, el contenido sale como ilegible.
+  reintentos: 2
+  # Tope de caracteres del markdown que se envía al modelo.
+  maxCaracteresEntrada: 60000
 
 umbrales:
   # Menos caracteres útiles que esto, sin contar encabezados de página, es un archivo ilegible.
