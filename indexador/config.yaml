@@ -1,0 +1,19 @@
+# Configuración por defecto del agente. Se puede reemplazar pasando otro archivo a indexar().
+
+# Versión del agente: va en Provenance.agentIdentifier y en el reporte.
+agentVersion: "indexador-catalogo@0.1.0"
+
+# Taxonomía y prompts vigentes: va en Provenance.configVersion. Si cambia, las comparaciones
+# entre corridas dejan de ser válidas (CLAUDE.md, sección 3.6).
+configVersion: "bloom-revisada@1;prompts@1"
+
+llm:
+  # "simulado": modelo falso y determinista, sin red ni credenciales (pruebas).
+  # "bedrock": Amazon Bedrock, el mismo proveedor que usa Yupi.
+  modo: "simulado"
+  modelo: null
+  region: "sa-east-1"
+
+umbrales:
+  # Menos caracteres útiles que esto, sin contar encabezados de página, es un archivo ilegible.
+  minCaracteresUtiles: 200

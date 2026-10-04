@@ -9,6 +9,7 @@ description = "Prototipo aislado del agente de indexación (Agente A) de Learnin
 readme = "README.md"
 requires-python = ">=3.10"
 dependencies = [
+    "langgraph>=1.0",
     "pydantic>=2.6",
     "pyyaml>=6.0",
 ]
@@ -18,8 +19,14 @@ dev = [
     "pytest>=8.0",
 ]
 
+[project.scripts]
+indexador = "indexador.__main__:main"
+
 [tool.setuptools.packages.find]
 include = ["indexador*"]
+
+[tool.setuptools.package-data]
+indexador = ["config.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
