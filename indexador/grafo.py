@@ -6,7 +6,9 @@ Grafo del lote:
 
 Subgrafo de un contenido:
     START → revisar_legibilidad → ¿legible?
-              sí → resolver_identidad → generar_metadata → proponer_respaldos → armar_objetos
+              sí → resolver_identidad → ¿elemento nuevo?
+                     sí → generar_metadata → proponer_respaldos → armar_objetos
+                     no (ya está en el catálogo) → armar_objetos
               no → marcar_ilegible → armar_objetos
           → END
 """
@@ -33,6 +35,10 @@ def es_legible(estado: EstadoContenido) -> str:
     return "resolver_identidad" if estado.get("legible", True) else "marcar_ilegible"
 
 
+def es_nuevo(estado: EstadoContenido) -> str:
+    return "armar_objetos" if estado.get("elementoExistente") else "generar_metadata"
+
+
 def construir_subgrafo_contenido():
     g = StateGraph(EstadoContenido)
     g.add_node("revisar_legibilidad", revisar_legibilidad)
@@ -43,7 +49,7 @@ def construir_subgrafo_contenido():
     g.add_node("armar_objetos", armar_objetos)
     g.add_edge(START, "revisar_legibilidad")
     g.add_conditional_edges("revisar_legibilidad", es_legible, ["resolver_identidad", "marcar_ilegible"])
-    g.add_edge("resolver_identidad", "generar_metadata")
+    g.add_conditional_edges("resolver_identidad", es_nuevo, ["generar_metadata", "armar_objetos"])
     g.add_edge("generar_metadata", "proponer_respaldos")
     g.add_edge("proponer_respaldos", "armar_objetos")
     g.add_edge("marcar_ilegible", "armar_objetos")

@@ -24,3 +24,8 @@ def catalog_file_ilegible(archivo: ArchivoEntrada, offering_id: str, ahora: str)
         sourceVersion=archivo.sourceVersion,
         detectedAt=ahora,
     )
+
+
+def id_learning_element(content_hash: str) -> str:
+    """Id local de un elemento nuevo: estable, derivado del contenido."""
+    return f"le-{content_hash[:12]}"

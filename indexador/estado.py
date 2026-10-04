@@ -33,6 +33,8 @@ class EstadoContenido(TypedDict, total=False):
     markdown: Optional[str]
     legible: bool
     motivo: Optional[str]
+    learningElementId: str
+    elementoExistente: bool
     advertencias: Annotated[list[str], operator.add]
     pasos: Annotated[list[str], operator.add]
     objetos: ObjetosCorrida
