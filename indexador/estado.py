@@ -41,6 +41,7 @@ class EstadoContenido(TypedDict, total=False):
     modelo: str
     tokensEntrada: Annotated[int, operator.add]
     tokensSalida: Annotated[int, operator.add]
+    markdownElemento: Optional[str]
     advertencias: Annotated[list[str], operator.add]
     pasos: Annotated[list[str], operator.add]
     objetos: ObjetosCorrida
@@ -58,6 +59,10 @@ class ResultadoContenido(TypedDict):
     juicios: list[JuicioRespaldo]
     tokensEntrada: int
     tokensSalida: int
+    learningElementId: Optional[str]
+    elementoExistente: bool
+    markdownElemento: Optional[str]
+    modelo: Optional[str]
 
 
 class EstadoLote(TypedDict, total=False):

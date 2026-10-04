@@ -93,6 +93,10 @@ def procesar_contenido(estado: EstadoContenido) -> dict:
         "juicios": final.get("juicios", []),
         "tokensEntrada": final.get("tokensEntrada", 0),
         "tokensSalida": final.get("tokensSalida", 0),
+        "learningElementId": final.get("learningElementId"),
+        "elementoExistente": final.get("elementoExistente", False),
+        "markdownElemento": final.get("markdownElemento"),
+        "modelo": final.get("modelo"),
     }
     return {"resultados": [resultado]}
 
