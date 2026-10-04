@@ -21,6 +21,9 @@ bedrock = [
 dev = [
     "pytest>=8.0",
 ]
+notebook = [
+    "jupyterlab>=4.1",
+]
 
 [project.scripts]
 indexador = "indexador.__main__:main"
