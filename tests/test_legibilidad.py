@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from indexador import indexar
@@ -64,11 +66,14 @@ def test_la_corrida_termina_y_reporta_los_ilegibles(carpeta_lote, tmp_path):
 
 
 def test_cada_ilegible_sale_como_catalog_file_unreadable(carpeta_lote, tmp_path):
-    objetos = indexar(carpeta_lote, tmp_path).reporte
-    archivos = {f.sourceIdentifier: f for f in objetos.archivos}
+    resultado = indexar(carpeta_lote, tmp_path)
+    archivos = {f.sourceIdentifier: f for f in resultado.reporte.archivos}
     for source_identifier in ILEGIBLES:
         assert archivos[source_identifier].objetos == {"catalogFiles": [f"cf-{source_identifier}"]}
-    assert objetos.totales.catalogFiles == 3
+    catalog_files = json.loads((resultado.carpeta / "objetos" / "catalog_files.json").read_text(encoding="utf-8"))
+    ilegibles = [c for c in catalog_files if c["detectionExtractionStatus"] == "Unreadable"]
+    assert {c["sourceIdentifier"] for c in ilegibles} == ILEGIBLES
+    assert all(c["learningElementId"] is None for c in ilegibles)
 
 
 def test_ninguna_otra_ruta_llega_a_marcar_ilegible(carpeta_lote, tmp_path):
