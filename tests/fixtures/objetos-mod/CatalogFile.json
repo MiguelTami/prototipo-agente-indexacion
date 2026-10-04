@@ -1,0 +1,123 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "CatalogFile",
+  "type": "object",
+  "metadata": {
+    "label": "Archivo",
+    "labelPlural": "Archivos",
+    "gender": "masculino",
+    "description": "The file as it exists in the source (LMS or institutional repository). It is not the model's governable entity, it is the raw material the Indexing layer detects. The same content can appear as several distinct Files; all of them must be identified as the same Learning Element. Since LAB-20 a file also records the dictated course (Offering) it was detected in, which is what gives an element a segment from the moment of ingestion, before any Usage exists. The Indexing layer resolves it from the course id the LMS already carries, through Offering.lmsId.",
+    "defaultLayoutType": "RecordList",
+    "indexes": ["learningElementId", "offeringId"]
+  },
+  "properties": {
+    "sourceSystem": {
+      "type": "string",
+      "title": "Source System",
+      "not_null": true,
+      "enum": ["Lms", "Repository"],
+      "description": "Source where the file lives. Configured by IT and platform."
+    },
+    "sourceIdentifier": {
+      "type": "string",
+      "title": "Source Identifier",
+      "not_null": true,
+      "description": "Identifier of the file in the source system."
+    },
+    "fileType": {
+      "type": "string",
+      "title": "File Type",
+      "not_null": true,
+      "enum": ["Pdf", "Video", "Audio", "Word", "Exam", "Other"],
+      "description": "Format of the file."
+    },
+    "sourceUrl": {
+      "type": "string",
+      "title": "Source Url",
+      "not_null": false,
+      "description": "URL in the LMS where this file is located. This is the raw address, deliberately not an object reference: it is what the output contract links to, with its version. The object-level counterpart is offeringId, which classifies rather than locates; the two coexist and answer different questions."
+    },
+    "offeringId": {
+      "type": "string",
+      "title": "Offering",
+      "not_null": false,
+      "isForeignKey": true,
+      "references": "Offering",
+      "targetField": "id",
+      "description": "Dictated course (Offering) this file was detected in, populated by the Indexing layer by matching the course id the source already carries against Offering.lmsId, which is unique per tenant. This is the answer to 'what happens to an element not used in any course yet': a file exists from ingestion, before any Usage does, so this is the only place a segment can be derived from at that moment, through Offering.activityLineId and ActivityLine.orgUnitId. Singular and not a list on purpose, and it does not contradict deduplication: the same content detected in two courses is two File rows, one per place, and they converge on one element through learningElementId, which is where deduplication has always happened. Nullable because a file from an institutional repository has no dictated course, and because the source may not expose it; a file without it derives no segment until a Usage appears. The two curator flows that start from an element, FLOW-01 and FLOW-02, fall back to it when the element has no Usage yet: usages first, this field only when there are none. Points at Offering rather than Activity because the dictated course carries the term, the LMS identity and the executing unit that the segment resolution needs. Replaces the former sectionId: Section is the scheduling proposal, and it has no field for the LMS identity."
+    },
+    "learningElementId": {
+      "type": "string",
+      "title": "Learning Element",
+      "not_null": true,
+      "isForeignKey": true,
+      "references": "LearningElement",
+      "targetField": "id",
+      "description": "Learning element this file was identified as. Every file belongs to exactly one object; it never creates a second object for the same content."
+    },
+    "contentHash": {
+      "type": "string",
+      "title": "Content Hash",
+      "not_null": false,
+      "description": "Hash of the file's content. First identification criterion."
+    },
+    "identificationMethod": {
+      "type": "string",
+      "title": "Identification Method",
+      "not_null": true,
+      "enum": ["ExactHash", "ContentSimilarity"],
+      "description": "How learningElementId was determined: exact hash match, or similarity of extracted text / semantic representation when there is no exact hash match."
+    },
+    "identificationConfidence": {
+      "type": "number",
+      "title": "Identification Confidence",
+      "not_null": false,
+      "description": "Confidence of the match (0-1) when the method is not exact hash. Below a threshold, the identification stays proposed and pending curator confirmation."
+    },
+    "identificationPending": {
+      "type": "boolean",
+      "title": "Identification Pending",
+      "not_null": true,
+      "static_default": "false",
+      "description": "True when identificationConfidence is below the review threshold (logic/) and learningElementId is a proposed match awaiting curator confirmation, not a resolved one. Drives Task.type=LowConfidenceIdentityMatch. Never creates a new Learning Element while true; the low-confidence match itself is tracked here and in this field's own Provenance record (entityType=CatalogFile)."
+    },
+    "detectionExtractionStatus": {
+      "type": "string",
+      "title": "Detection Extraction Status",
+      "not_null": true,
+      "enum": ["Detected", "Extracted", "Unreadable"],
+      "static_default": "Detected",
+      "description": "Unreadable is a first-class status, not a hidden error."
+    },
+    "sourceVersion": {
+      "type": "string",
+      "title": "Source Version",
+      "not_null": false,
+      "description": "Version or last modification date in the source. Sustains traceability of the published object."
+    },
+    "detectedAt": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Detected At",
+      "not_null": true,
+      "description": "When the Indexing layer detected this file."
+    },
+    "lastSyncedAt": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Last Synced At",
+      "not_null": false,
+      "description": "Last time it was checked for changes in the source."
+    }
+  },
+  "required": [
+    "sourceSystem",
+    "sourceIdentifier",
+    "fileType",
+    "learningElementId",
+    "identificationMethod",
+    "identificationPending",
+    "detectionExtractionStatus",
+    "detectedAt"
+  ]
+}

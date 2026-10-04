@@ -1,0 +1,68 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Usage",
+  "type": "object",
+  "metadata": {
+    "label": "Uso",
+    "labelPlural": "Usos",
+    "gender": "masculino",
+    "description": "The Learning Element applied to a dictated course (Offering) in a term. The operational level of the model: this is where the professor's permission lives, derived from who teaches the offering (TeachingAssignment). Anchored on Offering and not on Section because Section is the scheduling proposal, while Offering is the course actually taught: the one that exists in the LMS and has teachers assigned. Does not reference File: traceability down to the physical file is resolved indirectly, through the Learning Element. Across terms a Usage does not carry over: each dictated course of a new term needs new usages.",
+    "defaultLayoutType": "RecordList",
+    "indexes": ["learningElementId", "offeringId"],
+    "uniqueConstraints": [["learningElementId", "offeringId"]]
+  },
+  "properties": {
+    "learningElementId": {
+      "type": "string",
+      "title": "Learning Element",
+      "not_null": true,
+      "isForeignKey": true,
+      "references": "LearningElement",
+      "targetField": "id",
+      "description": "Element applied in this dictated course."
+    },
+    "offeringId": {
+      "type": "string",
+      "title": "Offering",
+      "not_null": true,
+      "isForeignKey": true,
+      "references": "Offering",
+      "targetField": "id",
+      "description": "Dictated course where the element is used: an Offering of recordType Syllabus, which is stated here and not validated: nothing checks the recordType at write time. Canonical level of the model. Replaces the former sectionId: the scheduling Section stays reachable, when it is set, through Offering.sectionId. Uniqueness is (learningElementId, offeringId): an Offering belongs to a single term, so the term adds nothing to the key. There is deliberately NO termId here any more: the term is read from Offering.termId. Keeping a copy was not only a coherence risk the platform cannot enforce, it broke the business-context route. Without sectionId, a termId foreign key gave this object a second four-hop path to the organization anchor, Usage.termId, then Term, then back through Section.termId as a reverse edge, then Section.orgUnitId, tied in length with the path through this field. The route discovery breaks ties by field order, and a renamed field is inserted as a new row, so in every migrated tenant that path would have won and scoped usages by an arbitrary section of the same term. With termId gone, the path through Offering and ActivityLine is the only shortest one, in any order. That holds for a tenant that never had the Section anchor. In a tenant that did, the retired field stays as an inactive field definition, and the context discovery still reads it because it filters isBaseField and not active: the three-hop route through the retired sectionId then wins, and a scoped read fails on a column that no longer exists, until the core filters inactive fields (docs/gaps/objetos-consumidos.md, 8.3)."
+    },
+    "weekOrUnit": {
+      "type": "string",
+      "title": "Week Or Unit",
+      "not_null": false,
+      "description": "Week or unit of the course where it is placed. Owner: Professor."
+    },
+    "order": {
+      "type": "integer",
+      "title": "Order",
+      "not_null": false,
+      "description": "Order within the week or unit. Owner: Professor."
+    },
+    "usageCharacter": {
+      "type": "string",
+      "title": "Usage Character",
+      "not_null": true,
+      "enum": ["Mandatory", "Complementary"],
+      "static_default": "Complementary",
+      "description": "Owner: Professor. Defaults to Complementary so ingestion never has to guess a value that is not its role to set; the default carries agent or propagation provenance until a professor sets it explicitly."
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "not_null": false,
+      "description": "Notes from the professor."
+    },
+    "sequencingReviewed": {
+      "type": "boolean",
+      "title": "Sequencing Reviewed",
+      "not_null": true,
+      "static_default": "false",
+      "description": "Whether a professor has already reviewed this usage's sequencing fields, per a Provenance record with origin=Person and actorRole=Professor. Derived and cached by business logic (logic/), same pattern as LearningElement.professorReviewed. Needed because weekOrUnit and order are optional and usageCharacter always carries a value (never empty), so their raw values alone cannot signal that a professor already looked at this usage and chose not to change anything."
+    }
+  },
+  "required": ["learningElementId", "offeringId", "usageCharacter", "sequencingReviewed"]
+}

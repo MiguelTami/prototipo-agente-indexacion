@@ -1,0 +1,127 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Backing",
+  "type": "object",
+  "metadata": {
+    "label": "Respaldo",
+    "labelPlural": "Respaldos",
+    "gender": "masculino",
+    "description": "The link between a Learning Element and a Learning Outcome, through the course. Since the outcome is canonical per course, a validated backing serves every study plan that includes that course. Has no term. Unique per (learningElementId, courseId, learningOutcomeId). The professor never creates a Backing: it always starts Proposed by an AI agent.",
+    "defaultLayoutType": "RecordList",
+    "indexes": [
+      "learningElementId",
+      "courseId",
+      "learningOutcomeId"
+    ],
+    "uniqueConstraints": [
+      [
+        "learningElementId",
+        "courseId",
+        "learningOutcomeId"
+      ]
+    ]
+  },
+  "properties": {
+    "learningElementId": {
+      "type": "string",
+      "title": "Learning Element",
+      "not_null": true,
+      "isForeignKey": true,
+      "references": "LearningElement",
+      "targetField": "id",
+      "description": "Object that backs the outcome."
+    },
+    "courseId": {
+      "type": "string",
+      "title": "Course",
+      "not_null": true,
+      "isForeignKey": true,
+      "references": "Activity",
+      "targetField": "id",
+      "description": "Course where the backing is declared (Activity with recordType Course). Bridge between object and outcome."
+    },
+    "learningOutcomeId": {
+      "type": "string",
+      "title": "Learning Outcome",
+      "not_null": true,
+      "isForeignKey": true,
+      "references": "CurricularSection",
+      "targetField": "id",
+      "description": "Learning outcome backed (CurricularSection with recordType LearningOutcome)."
+    },
+    "character": {
+      "type": "string",
+      "title": "Character",
+      "not_null": true,
+      "enum": [
+        "Develops",
+        "Evaluates",
+        "Both"
+      ],
+      "description": "Pedagogical role of the object relative to the outcome. Enables the accreditation finding of an outcome backed only by objects that develop, none that evaluate."
+    },
+    "offeredCognitiveLevel": {
+      "type": "string",
+      "title": "Offered Cognitive Level",
+      "not_null": false,
+      "enum": [
+        "Remember",
+        "Understand",
+        "Apply",
+        "Analyze",
+        "Evaluate",
+        "Create"
+      ],
+      "description": "Cognitive level the object actually offers for this outcome in this course. Not a copy of the element's general cognitiveLevel; the main metric compares the outcome's required level against this field."
+    },
+    "modelConfidence": {
+      "type": "number",
+      "title": "Model Confidence",
+      "not_null": false,
+      "description": "Confidence (0-1) of the AI model when proposing this backing. Below a threshold (defined in logic/), the backing enters the curator queue as LowConfidenceBacking. This is the AI half of the backing's confidence; the professor half is not stored here, it is derived from whether a BackingJudgment with decision=Confirm exists for this backing."
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "not_null": true,
+      "enum": [
+        "Proposed",
+        "Validated"
+      ],
+      "static_default": "Proposed",
+      "description": "Validated requires prior usage of the object in that course."
+    },
+    "proposedWithoutUsage": {
+      "type": "boolean",
+      "title": "Proposed Without Usage",
+      "not_null": true,
+      "static_default": "false",
+      "description": "Whether the backing was born without prior usage of the element in this course (detected by semantic similarity). Only applies while status=Proposed; never true on a validated backing."
+    },
+    "validatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Validated At",
+      "not_null": false,
+      "description": "When the backing was validated."
+    },
+    "validatedById": {
+      "type": "string",
+      "title": "Validated By",
+      "not_null": false,
+      "description": "Curator (core_User id) who validated the backing.",
+      "isForeignKey": true,
+      "references": "core_User",
+      "targetField": "id",
+      "onDelete": "SetNull"
+    }
+  },
+  "required": [
+    "learningElementId",
+    "courseId",
+    "learningOutcomeId",
+    "character",
+    "status",
+    "proposedWithoutUsage"
+  ]
+}

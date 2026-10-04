@@ -1,0 +1,117 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Provenance",
+  "type": "object",
+  "metadata": {
+    "label": "Proveniencia",
+    "labelPlural": "Proveniencias",
+    "gender": "femenino",
+    "description": "Record of who or what established the current value of a tracked field of a Learning Element, a Usage, a Backing, or a File, and when. Polymorphic owner (entityType/entityId), one row per entity+field combination. Not a change history: it stores only the provenance of the current value and is overwritten when the field changes, unless the hard rule below blocks the overwrite. Own object of Catalog: it does not reuse the Learning Assurance audit mechanism nor core_DataLog because neither covers agent_ia or seed_propagation, nor captures the actor's role/segment.",
+    "defaultLayoutType": "RecordList",
+    "indexes": [
+      "entityType",
+      "entityId"
+    ],
+    "uniqueConstraints": [
+      [
+        "entityType",
+        "entityId",
+        "fieldName"
+      ]
+    ]
+  },
+  "properties": {
+    "entityType": {
+      "type": "string",
+      "title": "Entity Type",
+      "not_null": true,
+      "enum": [
+        "LearningElement",
+        "Usage",
+        "Backing",
+        "CatalogFile"
+      ],
+      "description": "Polymorphic owner: same ownerType/ownerId pattern already used by the Learning Assurance object model. CatalogFile added to trace low-confidence identification matches pending curator confirmation (CatalogFile.identificationPending)."
+    },
+    "entityId": {
+      "type": "string",
+      "title": "Entity",
+      "not_null": true,
+      "description": "Identifier of the owning entity (LearningElement, Usage, Backing, or CatalogFile, per entityType). Polymorphic reference, no real FK because it points to different tables."
+    },
+    "fieldName": {
+      "type": "string",
+      "title": "Field Name",
+      "not_null": true,
+      "description": "Name of the tracked field (for example description, cognitiveLevel, rights, evaluationStatus). Unique together with entityType + entityId: a field has at most one current provenance record. Not limited to editorial fields: it also covers automatic diagnostics generated against a versioned configuration, such as evaluationStatus on the Learning Element (a judgment against a rubric, same as cognitiveLevel is a judgment against a taxonomy)."
+    },
+    "origin": {
+      "type": "string",
+      "title": "Origin",
+      "not_null": true,
+      "enum": [
+        "Lms",
+        "AiAgent",
+        "Person",
+        "SeedPropagation"
+      ],
+      "description": "SeedPropagation is the value when a Usage field was created because it was propagated from a seed dictated course (a template Offering) when a new dictated course was created; if the professor edits it afterward, that field's provenance moves to Person. The concept survives the move from Section to Offering unchanged: what is propagated is the course's usages, and the dictated course is where they live now."
+    },
+    "actorId": {
+      "type": "string",
+      "title": "Actor",
+      "not_null": false,
+      "description": "Who generated or validated the value (core_User id), if origin = Person.",
+      "isForeignKey": true,
+      "references": "core_User",
+      "targetField": "id",
+      "onDelete": "SetNull"
+    },
+    "agentIdentifier": {
+      "type": "string",
+      "title": "Agent Identifier",
+      "not_null": false,
+      "description": "Which agent or model generated the value, if origin = AiAgent."
+    },
+    "actorRole": {
+      "type": "string",
+      "title": "Actor Role",
+      "not_null": false,
+      "enum": [
+        "Authority",
+        "Curator",
+        "Professor"
+      ],
+      "description": "Only if origin = Person."
+    },
+    "actorSegmentId": {
+      "type": "string",
+      "title": "Actor Segment",
+      "not_null": false,
+      "isForeignKey": true,
+      "references": "Segment",
+      "targetField": "id",
+      "description": "Segment of the actor at the time of the action. Relevant to resolve conflicts between segments."
+    },
+    "recordedAt": {
+      "type": "string",
+      "format": "date-time",
+      "title": "Recorded At",
+      "not_null": true,
+      "description": "When the value was established."
+    },
+    "configVersion": {
+      "type": "string",
+      "title": "Config Version",
+      "not_null": false,
+      "description": "Taxonomy or configuration in effect when the value was generated, if origin = AiAgent. A configuration change invalidates comparisons between cuts."
+    }
+  },
+  "required": [
+    "entityType",
+    "entityId",
+    "fieldName",
+    "origin",
+    "recordedAt"
+  ]
+}

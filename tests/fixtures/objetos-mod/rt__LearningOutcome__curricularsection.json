@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "LearningOutcome",
+  "baseObject": "CurricularSection",
+  "metadata": {
+    "label": "Resultado de aprendizaje",
+    "labelPlural": "Resultados de aprendizaje",
+    "description": "Resultado de aprendizaje (RA) que el estudiante debe alcanzar al completar el programa de asignatura. Cada RA describe un comportamiento observable y medible, asociado a un nivel cognitivo de la taxonomía de Bloom."
+  },
+  "properties": {
+    "code": {
+      "type": "string",
+      "title": "Code",
+      "not_null": false,
+      "description": "Código del resultado de aprendizaje (por ejemplo: RA-01, RA-02)."
+    },
+    "bloomLevel": {
+      "type": "string",
+      "title": "Bloom Level",
+      "not_null": false,
+      "enum": ["Remember", "Understand", "Apply", "Analyze", "Evaluate", "Create"],
+      "description": "Nivel cognitivo del resultado según la taxonomía de Bloom revisada."
+    },
+    "isRequiredInAllSections": {
+      "type": "boolean",
+      "title": "Required In All Sections",
+      "not_null": false,
+      "static_default": "false",
+      "description": "Indica si este resultado es obligatorio en todas las secciones dictadas del programa (RA crítico)."
+    }
+  }
+}
