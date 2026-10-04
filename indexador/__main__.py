@@ -5,8 +5,10 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from pathlib import Path
 
 from indexador.corrida import indexar
+from indexador.evaluacion import escribir_evaluacion, evaluar
 from indexador.traza import traza_terminal
 
 
@@ -23,7 +25,21 @@ def main(argv: list[str] | None = None) -> int:
         action="store_true",
         help="Muestra lo que devolvió cada nodo y escribe traza.json y traza.md en la salida",
     )
+    parser.add_argument(
+        "--evaluar",
+        action="store_true",
+        help="Compara la corrida con las respuestas esperadas y escribe evaluacion.json y evaluacion.md",
+    )
+    parser.add_argument(
+        "--esperado",
+        default=None,
+        help="Archivo de respuestas esperadas (por defecto, esperado.json dentro de la carpeta de entrada)",
+    )
     args = parser.parse_args(argv)
+
+    ruta_esperado = Path(args.esperado) if args.esperado else Path(args.entrada) / "esperado.json"
+    if args.evaluar and not ruta_esperado.is_file():
+        parser.error(f"no existe el archivo de respuestas esperadas: {ruta_esperado}")
 
     resultado = indexar(args.entrada, args.salida, args.config, trazar=args.trazar)
     if args.trazar:
@@ -33,10 +49,19 @@ def main(argv: list[str] | None = None) -> int:
     t = resultado.reporte.totales
     print(f"Corrida {resultado.runId}")
     print(f"  {t.archivosRecibidos} archivos, {t.contenidosUnicos} contenidos únicos")
-    print(f"  {t.archivosProcesados} procesados, {t.archivosIlegibles} ilegibles")
+    print(f"  {t.archivosProcesados} procesados, {t.archivosVinculados} vinculados, {t.archivosIlegibles} ilegibles")
     print(f"  Salida: {resultado.carpeta}")
     if args.trazar:
         print(f"  Traza completa: {resultado.carpeta / 'traza.md'}")
+
+    if args.evaluar:
+        evaluacion = evaluar(resultado.carpeta, ruta_esperado)
+        escribir_evaluacion(evaluacion, resultado.carpeta)
+        print(f"\nAcuerdo con las respuestas esperadas ({evaluacion.estadoEsperado}):")
+        for campo, acuerdo in evaluacion.campos.items():
+            if acuerdo.total:
+                print(f"  {campo:20} {acuerdo.aciertos:>3}/{acuerdo.total:<3} {acuerdo.porcentaje:>5} %")
+        print(f"  Desacuerdos: {len(evaluacion.desacuerdos)} · detalle en {resultado.carpeta / 'evaluacion.md'}")
     return 0
 
 
