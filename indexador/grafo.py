@@ -31,6 +31,7 @@ from indexador.nodos.marcar_ilegible import marcar_ilegible
 from indexador.nodos.proponer_respaldos import proponer_respaldos
 from indexador.nodos.resolver_identidad import resolver_identidad
 from indexador.nodos.revisar_legibilidad import revisar_legibilidad
+from indexador.traza import resumir_salida
 
 
 def es_legible(estado: EstadoContenido) -> str:
@@ -82,7 +83,13 @@ def repartir(estado: EstadoLote) -> list[Send]:
 
 
 def procesar_contenido(estado: EstadoContenido) -> dict:
-    final = SUBGRAFO_CONTENIDO.invoke(estado)
+    # stream en vez de invoke: además del estado final, queda lo que devolvió cada nodo.
+    final, traza = dict(estado), []
+    for modo, dato in SUBGRAFO_CONTENIDO.stream(estado, stream_mode=["updates", "values"]):
+        if modo == "values":
+            final = dato
+        else:
+            traza += [{"nodo": nodo, "salida": resumir_salida(cambios or {})} for nodo, cambios in dato.items()]
     resultado: ResultadoContenido = {
         "contenido": final["contenido"],
         "legible": final.get("legible", True),
@@ -97,6 +104,7 @@ def procesar_contenido(estado: EstadoContenido) -> dict:
         "elementoExistente": final.get("elementoExistente", False),
         "markdownElemento": final.get("markdownElemento"),
         "modelo": final.get("modelo"),
+        "traza": traza,
     }
     return {"resultados": [resultado]}
 

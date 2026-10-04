@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections import Counter
 from datetime import datetime, timezone
 from pathlib import Path
@@ -9,6 +10,7 @@ from pathlib import Path
 from indexador.esquemas.reporte import Reporte, ReporteArchivo, ReporteRespaldo, Totales
 from indexador.estado import EstadoLote, ResultadoContenido
 from indexador.objetos import id_backing
+from indexador.traza import traza_markdown
 
 
 def _estado_archivo(resultado: ResultadoContenido) -> str:
@@ -178,4 +180,22 @@ def generar_reporte(estado: EstadoLote) -> dict:
     carpeta = Path(estado["carpetaSalida"])
     (carpeta / "reporte.json").write_text(reporte.model_dump_json(indent=2) + "\n", encoding="utf-8")
     (carpeta / "reporte.md").write_text(reporte_markdown(reporte), encoding="utf-8")
+    if estado.get("trazar"):
+        escribir_traza(estado, carpeta)
     return {"reporte": reporte}
+
+
+def escribir_traza(estado: EstadoLote, carpeta: Path) -> None:
+    """traza.json y traza.md, en el orden del manifiesto."""
+    orden = {a.sourceIdentifier: i for i, a in enumerate(estado["entrada"].lote.archivos)}
+    entradas = [
+        {
+            "sourceIdentifiers": [a.sourceIdentifier for a in r["contenido"]["archivos"]],
+            "tituloLms": r["contenido"]["archivos"][0].tituloLms,
+            "pasos": r.get("traza", []),
+        }
+        for r in estado.get("resultados", [])
+    ]
+    entradas.sort(key=lambda e: orden[e["sourceIdentifiers"][0]])
+    (carpeta / "traza.json").write_text(json.dumps(entradas, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    (carpeta / "traza.md").write_text(traza_markdown(entradas), encoding="utf-8")

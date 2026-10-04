@@ -63,6 +63,7 @@ class ResultadoContenido(TypedDict):
     elementoExistente: bool
     markdownElemento: Optional[str]
     modelo: Optional[str]
+    traza: list[dict]
 
 
 class EstadoLote(TypedDict, total=False):
@@ -77,3 +78,4 @@ class EstadoLote(TypedDict, total=False):
     resultados: Annotated[list[ResultadoContenido], operator.add]
     objetos: ObjetosCorrida
     reporte: Reporte
+    trazar: bool

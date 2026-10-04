@@ -28,10 +28,12 @@ def indexar(
     entrada: str | Path,
     salida: str | Path,
     config: Config | str | Path | None = None,
+    trazar: bool = False,
 ) -> ResultadoCorrida:
     """Procesa la carpeta de entrada y escribe salida/<runId>/.
 
-    Cada corrida crea su propia carpeta y nunca sobrescribe una anterior.
+    Cada corrida crea su propia carpeta y nunca sobrescribe una anterior. Con trazar=True escribe
+    además traza.json y traza.md: lo que devolvió cada nodo, contenido por contenido.
     """
     if not isinstance(config, Config):
         config = cargar_config(config)
@@ -49,6 +51,7 @@ def indexar(
             "runId": run_id,
             "inicio": ahora.isoformat(timespec="seconds"),
             "carpetaSalida": str(carpeta),
+            "trazar": trazar,
         }
     )
     return ResultadoCorrida(runId=run_id, carpeta=carpeta, reporte=final["reporte"])
