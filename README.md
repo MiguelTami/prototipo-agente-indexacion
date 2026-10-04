@@ -43,6 +43,32 @@ print(resultado.reporte.totales)
 
 El recorrido guiado está en `notebooks/prototipo.ipynb` (abrir con `jupyter lab`).
 
+### Ver cada nodo y medir el resultado
+
+```bash
+python -m indexador --entrada ejemplos/curso-412711 --salida salida --trazar --evaluar
+```
+
+- `--trazar` imprime lo que devolvió cada nodo, contenido por contenido, y escribe `traza.json`
+  y `traza.md` en la carpeta de la corrida.
+- `--evaluar` compara la corrida con las respuestas esperadas (`esperado.json` de la carpeta de
+  entrada, u otro archivo con `--esperado`) y escribe `evaluacion.json` y `evaluacion.md` con el
+  acuerdo por campo y cada desacuerdo.
+
+La evaluación también se puede correr sobre una corrida anterior:
+
+```python
+from indexador.evaluacion import evaluar, escribir_evaluacion
+
+evaluacion = evaluar("salida/<runId>", "ejemplos/curso-412711/esperado.json")
+escribir_evaluacion(evaluacion, "salida/<runId>")
+```
+
+Qué se mide, por elemento: nivel cognitivo, tipo de conocimiento, idioma, autores, términos
+clave, rango de tiempo y que el título no copie el del LMS; por respaldo: si aporta al RA y con
+qué carácter; por archivo: el estado final. Es la tasa de acuerdo humano-IA por campo que el
+diseño del producto pide medir antes de lanzar.
+
 ### Qué escribe una corrida
 
 ```
@@ -55,6 +81,8 @@ salida/<runId>/
   markdown/<elemento>.md           contenido extraído con su metadata, el que irá a S3
   reporte.json                     para máquinas
   reporte.md                       para personas: totales, ilegibles, razones de los respaldos
+  traza.json, traza.md             con --trazar: lo que devolvió cada nodo
+  evaluacion.json, evaluacion.md   con --evaluar: acuerdo con las respuestas esperadas
 ```
 
 ### Modo del modelo
@@ -111,6 +139,8 @@ indexador/
   legibilidad.py      reglas de legibilidad
   objetos.py          construcción de objetos y proveniencia
   llm.py              modelo simulado y Amazon Bedrock
+  traza.py            traza nodo por nodo
+  evaluacion.py       acuerdo con las respuestas esperadas
   prompts/            prompts del modelo real
   esquemas/           modelos Pydantic de entrada, salida y reporte
   config.yaml         configuración por defecto
