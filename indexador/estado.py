@@ -14,6 +14,7 @@ from indexador.config import Config
 from indexador.esquemas.entrada import ArchivoEntrada, EntradaLote
 from indexador.esquemas.reporte import Reporte
 from indexador.esquemas.salida import ObjetosCorrida
+from indexador.llm import JuicioRespaldo, MetadataPropuesta
 
 
 class Contenido(TypedDict):
@@ -35,6 +36,11 @@ class EstadoContenido(TypedDict, total=False):
     motivo: Optional[str]
     learningElementId: str
     elementoExistente: bool
+    metadata: MetadataPropuesta
+    juicios: list[JuicioRespaldo]
+    modelo: str
+    tokensEntrada: Annotated[int, operator.add]
+    tokensSalida: Annotated[int, operator.add]
     advertencias: Annotated[list[str], operator.add]
     pasos: Annotated[list[str], operator.add]
     objetos: ObjetosCorrida
@@ -49,6 +55,9 @@ class ResultadoContenido(TypedDict):
     advertencias: list[str]
     pasos: list[str]
     objetos: ObjetosCorrida
+    juicios: list[JuicioRespaldo]
+    tokensEntrada: int
+    tokensSalida: int
 
 
 class EstadoLote(TypedDict, total=False):

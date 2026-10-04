@@ -7,7 +7,9 @@ Grafo del lote:
 Subgrafo de un contenido:
     START → revisar_legibilidad → ¿legible?
               sí → resolver_identidad → ¿elemento nuevo?
-                     sí → generar_metadata → proponer_respaldos → armar_objetos
+                     sí → generar_metadata → ¿metadata válida?
+                            sí → proponer_respaldos → armar_objetos
+                            no (el modelo falló tras los reintentos) → marcar_ilegible
                      no (ya está en el catálogo) → armar_objetos
               no → marcar_ilegible → armar_objetos
           → END
@@ -39,6 +41,10 @@ def es_nuevo(estado: EstadoContenido) -> str:
     return "armar_objetos" if estado.get("elementoExistente") else "generar_metadata"
 
 
+def tiene_metadata(estado: EstadoContenido) -> str:
+    return "proponer_respaldos" if estado.get("legible", True) else "marcar_ilegible"
+
+
 def construir_subgrafo_contenido():
     g = StateGraph(EstadoContenido)
     g.add_node("revisar_legibilidad", revisar_legibilidad)
@@ -50,7 +56,7 @@ def construir_subgrafo_contenido():
     g.add_edge(START, "revisar_legibilidad")
     g.add_conditional_edges("revisar_legibilidad", es_legible, ["resolver_identidad", "marcar_ilegible"])
     g.add_conditional_edges("resolver_identidad", es_nuevo, ["generar_metadata", "armar_objetos"])
-    g.add_edge("generar_metadata", "proponer_respaldos")
+    g.add_conditional_edges("generar_metadata", tiene_metadata, ["proponer_respaldos", "marcar_ilegible"])
     g.add_edge("proponer_respaldos", "armar_objetos")
     g.add_edge("marcar_ilegible", "armar_objetos")
     g.add_edge("armar_objetos", END)
@@ -84,6 +90,9 @@ def procesar_contenido(estado: EstadoContenido) -> dict:
         "advertencias": final.get("advertencias", []),
         "pasos": final.get("pasos", []),
         "objetos": final["objetos"],
+        "juicios": final.get("juicios", []),
+        "tokensEntrada": final.get("tokensEntrada", 0),
+        "tokensSalida": final.get("tokensSalida", 0),
     }
     return {"resultados": [resultado]}
 
