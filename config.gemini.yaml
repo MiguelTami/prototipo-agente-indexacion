@@ -1,0 +1,23 @@
+# Configuración para correr el agente con Gemini (Google AI Studio, capa gratuita).
+# La llave NO va aquí: va en el archivo .env como GOOGLE_API_KEY (ver .env.example).
+#
+#   python -m indexador --entrada ejemplos/curso-412711 --salida salida --config config.gemini.yaml --trazar --evaluar
+
+agentVersion: "indexador-catalogo@0.1.0"
+configVersion: "bloom-revisada@1;prompts@1"
+
+llm:
+  modo: "gemini"
+  # Revisa en AI Studio qué modelos tiene tu capa gratuita y sus límites:
+  # https://aistudio.google.com/rate-limit
+  modelo: "gemini-3.5-flash-lite"
+  temperatura: 0.0
+  # La capa gratuita limita las solicitudes por minuto: pocos contenidos a la vez y reintentos
+  # con espera creciente (10 s, 20 s, 40 s, 80 s) si responde con límite de solicitudes.
+  maxConcurrencia: 2
+  reintentos: 4
+  esperaReintentoSegundos: 10
+  maxCaracteresEntrada: 60000
+
+umbrales:
+  minCaracteresUtiles: 100
