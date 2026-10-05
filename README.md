@@ -20,6 +20,7 @@ Requiere Python 3.10 o superior.
 python -m venv .venv
 # Windows: .venv\Scripts\activate    Linux/macOS: source .venv/bin/activate
 pip install -e ".[dev]"             # agente + pruebas
+pip install -e ".[gemini]"          # opcional: Gemini (Google AI Studio)
 pip install -e ".[bedrock]"         # opcional: Amazon Bedrock
 pip install -e ".[notebook]"        # opcional: JupyterLab para el notebook
 ```
@@ -91,7 +92,20 @@ salida/<runId>/
 deterministas, sin red ni credenciales, útiles para probar el flujo pero no para juzgar la
 calidad de la metadata.
 
-Para usar Amazon Bedrock, copiar ese archivo, cambiar `llm.modo` a `"bedrock"`, poner en
+**Gemini (Google AI Studio).** Copiar `.env.example` como `.env` y poner la llave en
+`GOOGLE_API_KEY` (el `.env` nunca se sube: está en `.gitignore`). Revisar en
+[AI Studio](https://aistudio.google.com/rate-limit) qué modelos tiene la capa gratuita y ajustar
+`llm.modelo` en `config.gemini.yaml` si hace falta. Luego:
+
+```bash
+python -m indexador --entrada ejemplos/curso-412711 --salida salida --config config.gemini.yaml --trazar --evaluar
+```
+
+`config.gemini.yaml` procesa 2 contenidos a la vez y reintenta con espera creciente, porque la
+capa gratuita limita las solicitudes por minuto. El lote de ejemplo hace 18 llamadas al modelo
+(metadata y respaldos de 9 elementos).
+
+**Amazon Bedrock.** Copiar `indexador/config.yaml`, cambiar `llm.modo` a `"bedrock"`, poner en
 `llm.modelo` el id de un modelo que soporte tool use, tener credenciales de AWS y correr con
 `--config mi-config.yaml`. Si el modelo falla tras los reintentos, el contenido sale como
 ilegible con su motivo y la corrida sigue.
