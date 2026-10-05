@@ -18,6 +18,7 @@ def proponer_respaldos(estado: EstadoContenido) -> dict:
     respuesta, errores = con_reintentos(
         lambda: modelo.juzgar_respaldos(estado["markdown"], estado["metadata"], contexto),
         config.llm.reintentos,
+        config.llm.esperaReintentoSegundos,
     )
     if respuesta is None:
         return {

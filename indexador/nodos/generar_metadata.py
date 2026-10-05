@@ -18,6 +18,7 @@ def generar_metadata(estado: EstadoContenido) -> dict:
     respuesta, errores = con_reintentos(
         lambda: modelo.generar_metadata(estado["markdown"], archivo, estado["entrada"].contexto),
         config.llm.reintentos,
+        config.llm.esperaReintentoSegundos,
     )
     if respuesta is None:
         return {
