@@ -9,6 +9,7 @@ from pathlib import Path
 
 from indexador.corrida import indexar
 from indexador.evaluacion import escribir_evaluacion, evaluar
+from indexador.llm import ErrorModelo
 from indexador.traza import traza_terminal
 
 
@@ -41,7 +42,10 @@ def main(argv: list[str] | None = None) -> int:
     if args.evaluar and not ruta_esperado.is_file():
         parser.error(f"no existe el archivo de respuestas esperadas: {ruta_esperado}")
 
-    resultado = indexar(args.entrada, args.salida, args.config, trazar=args.trazar)
+    try:
+        resultado = indexar(args.entrada, args.salida, args.config, trazar=args.trazar)
+    except ErrorModelo as error:
+        parser.exit(2, f"indexador: {error}\n")
     if args.trazar:
         entradas = json.loads((resultado.carpeta / "traza.json").read_text(encoding="utf-8"))
         print(traza_terminal(entradas))
@@ -51,6 +55,10 @@ def main(argv: list[str] | None = None) -> int:
     print(f"  {t.archivosRecibidos} archivos, {t.contenidosUnicos} contenidos únicos")
     print(f"  {t.archivosProcesados} procesados, {t.archivosVinculados} vinculados, {t.archivosIlegibles} ilegibles")
     print(f"  Salida: {resultado.carpeta}")
+    fallas_modelo = [f for f in resultado.reporte.archivos if f.motivo and f.motivo.startswith("El modelo no devolvió")]
+    if fallas_modelo and t.archivosProcesados == 0:
+        print(f"  Atención: el modelo falló en los {len(fallas_modelo)} archivos que llegaron a él.")
+        print(f"  Revisa la llave, el id del modelo y la conexión. Primer error: {fallas_modelo[0].motivo}")
     if args.trazar:
         print(f"  Traza completa: {resultado.carpeta / 'traza.md'}")
 

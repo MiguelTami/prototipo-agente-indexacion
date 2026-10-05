@@ -7,10 +7,11 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
 
-from indexador.config import Config, cargar_config
+from indexador.config import Config, cargar_config, cargar_env
 from indexador.esquemas.entrada import cargar_entrada
 from indexador.esquemas.reporte import Reporte
 from indexador.grafo import GRAFO_LOTE
+from indexador.llm import obtener_modelo
 
 
 @dataclass(frozen=True)
@@ -35,9 +36,12 @@ def indexar(
     Cada corrida crea su propia carpeta y nunca sobrescribe una anterior. Con trazar=True escribe
     además traza.json y traza.md: lo que devolvió cada nodo, contenido por contenido.
     """
+    cargar_env()
     if not isinstance(config, Config):
         config = cargar_config(config)
     lote = cargar_entrada(entrada)
+    # Falla aquí, antes de crear la carpeta de salida, si falta la llave o el modelo.
+    obtener_modelo(config)
 
     ahora = datetime.now(timezone.utc)
     run_id = _nuevo_run_id(ahora)
@@ -52,6 +56,7 @@ def indexar(
             "inicio": ahora.isoformat(timespec="seconds"),
             "carpetaSalida": str(carpeta),
             "trazar": trazar,
-        }
+        },
+        config={"max_concurrency": config.llm.maxConcurrencia},
     )
     return ResultadoCorrida(runId=run_id, carpeta=carpeta, reporte=final["reporte"])
