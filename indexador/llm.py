@@ -1,4 +1,4 @@
-"""El modelo que usa el agente: Amazon Bedrock o un simulado determinista.
+"""El modelo que usa el agente: Amazon Bedrock, Gemini o un simulado determinista.
 
 Los nodos no conocen el proveedor: piden metadata o juicios de respaldo a un ModeloAgente y
 reciben objetos ya validados por Pydantic. El modo simulado no usa red ni credenciales; sirve
@@ -8,6 +8,7 @@ para las pruebas y para revisar el flujo, no para juzgar la calidad de la metada
 from __future__ import annotations
 
 import math
+import os
 import re
 import threading
 from collections import Counter
@@ -204,7 +205,7 @@ class ModeloSimulado:
         return Respuesta(JuiciosRespaldo(juicios=juicios))
 
 
-# --- Modelo en Amazon Bedrock ---------------------------------------------------------------
+# --- Modelos reales (LangChain) -------------------------------------------------------------
 
 
 def _prompt(nombre: str) -> str:
@@ -217,21 +218,17 @@ def _rellenar(plantilla: str, valores: dict[str, str]) -> str:
     return plantilla
 
 
-class ModeloBedrock:
-    """Amazon Bedrock vía langchain-aws, con salida estructurada validada por Pydantic."""
+class _ModeloLangChain:
+    """Lo común a los proveedores reales: mismos prompts, salida estructurada validada por Pydantic.
 
-    def __init__(self, config: Config):
-        try:
-            from langchain_aws import ChatBedrockConverse
-        except ImportError as error:  # pragma: no cover - depende de la instalación
-            raise ErrorModelo('Falta langchain-aws: pip install -e ".[bedrock]"') from error
-        if not config.llm.modelo:
-            raise ErrorModelo("llm.modelo está vacío: indica el id del modelo de Bedrock en la configuración")
-        self.identificador = f"bedrock/{config.llm.modelo}"
+    Cada proveedor solo construye su chat de LangChain; todo lo demás es igual.
+    """
+
+    identificador: str
+
+    def __init__(self, chat, identificador: str, config: Config):
+        self.identificador = identificador
         self._max_caracteres = config.llm.maxCaracteresEntrada
-        chat = ChatBedrockConverse(
-            model=config.llm.modelo, region_name=config.llm.region, temperature=config.llm.temperatura
-        )
         self._metadata = chat.with_structured_output(MetadataPropuesta, include_raw=True)
         self._respaldos = chat.with_structured_output(JuiciosRespaldo, include_raw=True)
 
@@ -276,6 +273,41 @@ class ModeloBedrock:
         return self._invocar(self._respaldos, _prompt("respaldos_sistema.md"), usuario)
 
 
+def _exigir_modelo(config: Config) -> str:
+    if not config.llm.modelo:
+        raise ErrorModelo(f"llm.modelo está vacío: indica el id del modelo para el modo {config.llm.modo}")
+    return config.llm.modelo
+
+
+class ModeloBedrock(_ModeloLangChain):
+    """Amazon Bedrock vía langchain-aws. Credenciales: las de AWS del entorno (perfil o SSO)."""
+
+    def __init__(self, config: Config):
+        try:
+            from langchain_aws import ChatBedrockConverse
+        except ImportError as error:  # pragma: no cover - depende de la instalación
+            raise ErrorModelo('Falta langchain-aws: pip install -e ".[bedrock]"') from error
+        modelo = _exigir_modelo(config)
+        chat = ChatBedrockConverse(model=modelo, region_name=config.llm.region, temperature=config.llm.temperatura)
+        super().__init__(chat, f"bedrock/{modelo}", config)
+
+
+class ModeloGemini(_ModeloLangChain):
+    """Gemini en Google AI Studio vía langchain-google-genai. Llave: GOOGLE_API_KEY o GEMINI_API_KEY."""
+
+    def __init__(self, config: Config):
+        try:
+            from langchain_google_genai import ChatGoogleGenerativeAI
+        except ImportError as error:  # pragma: no cover - depende de la instalación
+            raise ErrorModelo('Falta langchain-google-genai: pip install -e ".[gemini]"') from error
+        modelo = _exigir_modelo(config)
+        llave = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
+        if not llave:
+            raise ErrorModelo("Falta la llave de Gemini: define GOOGLE_API_KEY en el archivo .env (ver .env.example)")
+        chat = ChatGoogleGenerativeAI(model=modelo, google_api_key=llave, temperature=config.llm.temperatura)
+        super().__init__(chat, f"gemini/{modelo}", config)
+
+
 # --- Fábrica --------------------------------------------------------------------------------
 
 _cache: dict[str, ModeloAgente] = {}
@@ -287,5 +319,6 @@ def obtener_modelo(config: Config) -> ModeloAgente:
     clave = config.llm.model_dump_json()
     with _lock:
         if clave not in _cache:
-            _cache[clave] = ModeloSimulado() if config.llm.modo == "simulado" else ModeloBedrock(config)
+            proveedores = {"simulado": lambda c: ModeloSimulado(), "bedrock": ModeloBedrock, "gemini": ModeloGemini}
+            _cache[clave] = proveedores[config.llm.modo](config)
         return _cache[clave]

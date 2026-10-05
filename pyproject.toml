@@ -18,6 +18,9 @@ dependencies = [
 bedrock = [
     "langchain-aws>=0.2",
 ]
+gemini = [
+    "langchain-google-genai>=4.0",
+]
 dev = [
     "pytest>=8.0",
 ]
