@@ -15,3 +15,6 @@ salida/
 
 # Credenciales locales
 .env
+
+# Lotes con archivos reales: no se suben al repositorio
+lotes-reales/
