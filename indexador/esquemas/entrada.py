@@ -122,7 +122,9 @@ class ResultadoAprendizaje(_Base):
     id: str
     code: str
     name: str = Field(description="Enunciado del RA.")
-    bloomLevel: BloomLevel
+    bloomLevel: Optional[BloomLevel] = Field(
+        default=None, description="Nivel requerido. Opcional, como en el modelo compartido."
+    )
 
 
 class ContextoCurso(_Base):

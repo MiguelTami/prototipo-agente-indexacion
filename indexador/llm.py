@@ -259,7 +259,7 @@ class _ModeloLangChain:
 
     def juzgar_respaldos(self, markdown, metadata, contexto):
         ras = "\n".join(
-            f"- {ra.code} (nivel requerido: {ra.bloomLevel}): {ra.name}" for ra in contexto.resultadosAprendizaje
+            f"- {ra.code} (nivel requerido: {ra.bloomLevel or 'no definido'}): {ra.name}" for ra in contexto.resultadosAprendizaje
         )
         usuario = _rellenar(
             _prompt("respaldos_usuario.md"),
