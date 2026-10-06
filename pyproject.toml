@@ -18,6 +18,9 @@ dependencies = [
 bedrock = [
     "langchain-aws>=0.2",
 ]
+pdf = [
+    "pdfplumber>=0.11",
+]
 gemini = [
     "langchain-google-genai>=4.0",
 ]
