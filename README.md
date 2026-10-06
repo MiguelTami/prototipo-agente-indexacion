@@ -75,6 +75,14 @@ python -m indexador --entrada lotes-reales/mi-curso --salida salida --config con
 
   También se pueden escribir directamente en `resultadosAprendizaje` de `contexto/curso.json` de un
   lote ya preparado, sin volver a convertir los PDF.
+- Con `--urls urls.json` se llena `sourceUrl` de cada archivo, que llega a `CatalogFile.sourceUrl`.
+  Es donde vive el archivo original y lo que la plataforma abre para mostrarlo. El archivo es un
+  objeto `{"nombre del PDF": "URL"}`; un PDF sin URL queda con `sourceUrl` vacío, y una URL que
+  nombra un PDF que no está en la carpeta detiene la preparación:
+
+  ```json
+  {"Semana 01 - Introduccion.pdf": "https://drive.google.com/file/d/.../view"}
+  ```
 - No hay `esperado.json` para un lote real, así que `--evaluar` no aplica salvo que alguien lo
   escriba.
 
