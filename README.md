@@ -63,8 +63,18 @@ python -m indexador --entrada lotes-reales/mi-curso --salida salida --config con
 - Si el nombre del archivo dice "Semana N", ese es el módulo del uso; si no, su posición en la
   carpeta. Los archivos se ordenan de forma natural (Semana 2 antes que Semana 10).
 - Sin `--ras`, el contexto no tiene resultados de aprendizaje: el agente genera elementos, usos y
-  proveniencia, pero no respaldos. Con `--ras ras.json` (lista de `{id, code, name, bloomLevel}`)
-  sí los propone.
+  proveniencia, pero no respaldos. Con `--ras ras.json` sí los propone. El archivo es una lista de
+  `{id, code, name, bloomLevel}`; `bloomLevel` es opcional, como en el modelo compartido:
+
+  ```json
+  [
+    {"id": "ra-01", "code": "RA-01", "name": "El estudiante analiza ...", "bloomLevel": "Analyze"},
+    {"id": "ra-02", "code": "RA-02", "name": "El estudiante identifica ..."}
+  ]
+  ```
+
+  También se pueden escribir directamente en `resultadosAprendizaje` de `contexto/curso.json` de un
+  lote ya preparado, sin volver a convertir los PDF.
 - No hay `esperado.json` para un lote real, así que `--evaluar` no aplica salvo que alguien lo
   escriba.
 
