@@ -108,3 +108,22 @@ def test_el_agente_procesa_el_lote_sin_ra(carpeta_pdfs, tmp_path):
     assert any("no tiene RA" in a for a in procesado.advertencias)
     usos = json.loads((resultado.carpeta / "objetos" / "usages.json").read_text(encoding="utf-8"))
     assert {u["weekOrUnit"] for u in usos} == {"Semana 1", "Semana 2", "Semana 10"}
+
+
+def test_ra_sin_nivel_de_bloom_dan_respaldos(carpeta_pdfs, tmp_path):
+    ras = tmp_path / "ras.json"
+    ras.write_text(
+        json.dumps(
+            [
+                {"id": "ra-1", "code": "RA1", "name": "Comprende la convivencia escolar entre estudiantes docentes y familias"},
+                {"id": "ra-2", "code": "RA2", "name": "Formula estados financieros consolidados"},
+            ]
+        ),
+        encoding="utf-8",
+    )
+    lote = preparar_lote(carpeta_pdfs, tmp_path / "lote", "Curso de prueba", ras=ras)
+    assert [r.bloomLevel for r in cargar_entrada(lote).contexto.resultadosAprendizaje] == [None, None]
+
+    resultado = indexar(lote, tmp_path / "salida")
+    backings = json.loads((resultado.carpeta / "objetos" / "backings.json").read_text(encoding="utf-8"))
+    assert backings and {b["learningOutcomeId"] for b in backings} == {"ra-1"}
