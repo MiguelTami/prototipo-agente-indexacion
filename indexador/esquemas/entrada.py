@@ -130,7 +130,9 @@ class ContextoCurso(_Base):
 
     curso: Curso
     cursoDictado: CursoDictado
-    resultadosAprendizaje: list[ResultadoAprendizaje] = Field(min_length=1)
+    resultadosAprendizaje: list[ResultadoAprendizaje] = Field(
+        default_factory=list, description="Vacío si el curso no tiene RA: no se proponen respaldos."
+    )
 
 
 class ElementoConocido(_Base):

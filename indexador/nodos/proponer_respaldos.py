@@ -14,6 +14,12 @@ from indexador.reintentos import con_reintentos
 def proponer_respaldos(estado: EstadoContenido) -> dict:
     config = estado["config"]
     contexto = estado["entrada"].contexto
+    if not contexto.resultadosAprendizaje:
+        return {
+            "pasos": ["proponer_respaldos"],
+            "juicios": [],
+            "advertencias": ["El curso no tiene RA en el contexto: no se proponen respaldos."],
+        }
     modelo = obtener_modelo(config)
     respuesta, errores = con_reintentos(
         lambda: modelo.juzgar_respaldos(estado["markdown"], estado["metadata"], contexto),
