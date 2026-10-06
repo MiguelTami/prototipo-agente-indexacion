@@ -21,6 +21,7 @@ python -m venv .venv
 # Windows: .venv\Scripts\activate    Linux/macOS: source .venv/bin/activate
 pip install -e ".[dev]"             # agente + pruebas
 pip install -e ".[gemini]"          # opcional: Gemini (Google AI Studio)
+pip install -e ".[pdf]"             # opcional: preparar lotes desde PDF reales
 pip install -e ".[bedrock]"         # opcional: Amazon Bedrock
 pip install -e ".[notebook]"        # opcional: JupyterLab para el notebook
 ```
@@ -43,6 +44,29 @@ print(resultado.reporte.totales)
 ```
 
 El recorrido guiado está en `notebooks/prototipo.ipynb` (abrir con `jupyter lab`).
+
+### Correr con PDF reales
+
+`indexador.preparar` hace fuera de uP1 lo que en la plataforma hace el core: convierte cada PDF
+a markdown (una sección `## Página N` por página), calcula el `contentHash` real sobre los bytes
+del PDF y marca como `failed` un PDF dañado, protegido o sin texto. Arma un lote listo para el
+agente.
+
+```bash
+# 1. Poner los PDF en lotes-reales/<curso>/pdfs/  (lotes-reales/ está en .gitignore)
+# 2. Armar el lote
+python -m indexador.preparar --pdfs lotes-reales/mi-curso/pdfs --salida lotes-reales/mi-curso --curso "Nombre del curso"
+# 3. Correr el agente
+python -m indexador --entrada lotes-reales/mi-curso --salida salida --config config.gemini.yaml --trazar
+```
+
+- Si el nombre del archivo dice "Semana N", ese es el módulo del uso; si no, su posición en la
+  carpeta. Los archivos se ordenan de forma natural (Semana 2 antes que Semana 10).
+- Sin `--ras`, el contexto no tiene resultados de aprendizaje: el agente genera elementos, usos y
+  proveniencia, pero no respaldos. Con `--ras ras.json` (lista de `{id, code, name, bloomLevel}`)
+  sí los propone.
+- No hay `esperado.json` para un lote real, así que `--evaluar` no aplica salvo que alguien lo
+  escriba.
 
 ### Ver cada nodo y medir el resultado
 
@@ -153,6 +177,7 @@ indexador/
   legibilidad.py      reglas de legibilidad
   objetos.py          construcción de objetos y proveniencia
   llm.py              modelo simulado y Amazon Bedrock
+  preparar.py         arma un lote desde una carpeta de PDF
   traza.py            traza nodo por nodo
   evaluacion.py       acuerdo con las respuestas esperadas
   prompts/            prompts del modelo real
@@ -166,6 +191,9 @@ tests/
 
 ## Límites conocidos de esta versión
 
+- Un archivo da un solo elemento, como dice el modelo del mod (`CatalogFile.learningElementId`
+  es una sola referencia). Partir un archivo extenso en varios elementos es la decisión abierta
+  A4 del diseño ("fragmento como unidad de recomendación").
 - La identidad se resuelve solo por hash exacto; la similitud necesita embeddings.
 - Solo respaldos del propio curso (sin `proposedWithoutUsage`).
 - Video y audio solo si llegan ya transcritos en un `.md`.
