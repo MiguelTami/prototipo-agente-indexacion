@@ -127,3 +127,24 @@ def test_ra_sin_nivel_de_bloom_dan_respaldos(carpeta_pdfs, tmp_path):
     resultado = indexar(lote, tmp_path / "salida")
     backings = json.loads((resultado.carpeta / "objetos" / "backings.json").read_text(encoding="utf-8"))
     assert backings and {b["learningOutcomeId"] for b in backings} == {"ra-1"}
+
+
+def test_urls_llenan_source_url_y_llegan_al_catalog_file(carpeta_pdfs, tmp_path):
+    urls = tmp_path / "urls.json"
+    urls.write_text(json.dumps({"Semana 1 - Introduccion.pdf": "https://ejemplo.org/semana-1"}), encoding="utf-8")
+    lote = preparar_lote(carpeta_pdfs, tmp_path / "lote", "Curso de prueba", urls=urls)
+    archivos = {a["core"]["filename"]: a for a in json.loads((lote / "lote.json").read_text(encoding="utf-8"))["archivos"]}
+    assert archivos["Semana 1 - Introduccion.pdf"]["sourceUrl"] == "https://ejemplo.org/semana-1"
+    assert archivos["Semana 2 - Marco legal.pdf"]["sourceUrl"] is None
+
+    corrida = indexar(lote, tmp_path / "salida").carpeta
+    catalog_files = json.loads((corrida / "objetos" / "catalog_files.json").read_text(encoding="utf-8"))
+    con_url = [c for c in catalog_files if c["sourceUrl"]]
+    assert [c["sourceUrl"] for c in con_url] == ["https://ejemplo.org/semana-1"]
+
+
+def test_urls_que_nombran_un_pdf_inexistente_fallan(carpeta_pdfs, tmp_path):
+    urls = tmp_path / "urls.json"
+    urls.write_text(json.dumps({"Semana 99 - No existe.pdf": "https://ejemplo.org/x"}), encoding="utf-8")
+    with pytest.raises(SystemExit, match="Semana 99"):
+        preparar_lote(carpeta_pdfs, tmp_path / "lote", "Curso de prueba", urls=urls)

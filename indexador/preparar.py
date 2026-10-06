@@ -9,6 +9,9 @@ Hace, fuera de uP1, lo que en la plataforma hace el core al convertir un archivo
 
 Uso:
     python -m indexador.preparar --pdfs lotes-reales/mi-curso/pdfs --salida lotes-reales/mi-curso --curso "Nombre del curso"
+
+Con --urls, un JSON {"nombre del PDF": "URL"} llena sourceUrl de cada archivo, que es donde el LMS
+dice que vive el archivo y lo que la plataforma abre para mostrarlo.
 """
 
 from __future__ import annotations
@@ -73,18 +76,33 @@ def convertir_pdf(datos: bytes) -> tuple[str, Optional[str], Optional[str], bool
     return "ok", markdown, None, False
 
 
+def _cargar_urls(urls: Optional[str | Path], pdfs: list[Path]) -> dict[str, str]:
+    """Lee el JSON {nombre del PDF: URL} y falla si nombra un PDF que no está en la carpeta."""
+    if not urls:
+        return {}
+    mapa = json.loads(Path(urls).read_text(encoding="utf-8"))
+    if not isinstance(mapa, dict) or not all(isinstance(v, str) and v.strip() for v in mapa.values()):
+        raise SystemExit(f"{urls} tiene que ser un objeto JSON {{\"nombre del PDF\": \"URL\"}}")
+    sobrantes = sorted(set(mapa) - {p.name for p in pdfs})
+    if sobrantes:
+        raise SystemExit(f"{urls} nombra PDF que no están en la carpeta: {', '.join(sobrantes)}")
+    return mapa
+
+
 def preparar_lote(
     carpeta_pdfs: str | Path,
     salida: str | Path,
     curso: str,
     ras: Optional[str | Path] = None,
     forzar: bool = False,
+    urls: Optional[str | Path] = None,
 ) -> Path:
     """Convierte los PDF de una carpeta y escribe un lote listo para indexar()."""
     carpeta_pdfs, salida = Path(carpeta_pdfs), Path(salida)
     pdfs = sorted((p for p in carpeta_pdfs.iterdir() if p.suffix.lower() == ".pdf"), key=_orden_natural)
     if not pdfs:
         raise SystemExit(f"No hay archivos .pdf en {carpeta_pdfs}")
+    mapa_urls = _cargar_urls(urls, pdfs)
     if (salida / "lote.json").exists() and not forzar:
         raise SystemExit(f"Ya existe {salida / 'lote.json'}; usa --forzar para reemplazarlo")
 
@@ -105,7 +123,7 @@ def preparar_lote(
                 "sourceIdentifier": f"pdf-{posicion:02d}",
                 "tituloLms": pdf.stem,
                 "fileType": "Pdf",
-                "sourceUrl": None,
+                "sourceUrl": mapa_urls.get(pdf.name),
                 "sourceVersion": datetime.fromtimestamp(pdf.stat().st_mtime, timezone.utc).isoformat(timespec="seconds"),
                 "modulo": _modulo(pdf.stem, posicion),
                 "orden": posicion,
@@ -151,14 +169,16 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--salida", required=True, help="Carpeta donde se escribe el lote")
     parser.add_argument("--curso", required=True, help="Nombre del curso")
     parser.add_argument("--ras", default=None, help="JSON opcional con los RA: [{id, code, name, bloomLevel}]")
+    parser.add_argument("--urls", default=None, help="JSON opcional {nombre del PDF: URL} para sourceUrl")
     parser.add_argument("--forzar", action="store_true", help="Reemplaza un lote existente")
     args = parser.parse_args(argv)
 
-    carpeta = preparar_lote(args.pdfs, args.salida, args.curso, args.ras, args.forzar)
+    carpeta = preparar_lote(args.pdfs, args.salida, args.curso, args.ras, args.forzar, args.urls)
     lote = json.loads((carpeta / "lote.json").read_text(encoding="utf-8"))
     print(f"Lote listo en {carpeta}")
     for a in lote["archivos"]:
-        print(f"  {a['sourceIdentifier']}  {a['modulo']:12}  {a['core']['markdownStatus']:10}  {a['core']['filename']}")
+        url = "con URL" if a["sourceUrl"] else "sin URL"
+        print(f"  {a['sourceIdentifier']}  {a['modulo']:12}  {a['core']['markdownStatus']:10}  {url:8}  {a['core']['filename']}")
     return 0
 
 
