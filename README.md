@@ -117,9 +117,9 @@ diseño del producto pide medir antes de lanzar.
 ```
 salida/<runId>/
   objetos/catalog_files.json       un CatalogFile por archivo, Unreadable si no se pudo leer
-  objetos/learning_elements.json   un elemento por contenido nuevo
+  objetos/learning_elements.json   un elemento por contenido nuevo (sin describir si no se pudo leer)
   objetos/backings.json            respaldos propuestos (siempre Proposed)
-  objetos/usages.json              un uso por archivo legible
+  objetos/usages.json              un uso por archivo, legible o no
   objetos/provenance.json          de dónde sale cada campo: AiAgent o Lms
   markdown/<elemento>.md           contenido extraído con su metadata, el que irá a S3
   reporte.json                     para máquinas
@@ -174,19 +174,27 @@ Grafo del lote:
               → consolidar_lote → escribir_salidas → generar_reporte
 
 Subgrafo de un contenido:
-  revisar_legibilidad → ¿legible?
+  revisar_legibilidad → resolver_identidad → ¿legible?
     no → marcar_ilegible → armar_objetos
-    sí → resolver_identidad → ¿ya está en el catálogo?
+    sí → ¿ya está en el catálogo?
            sí → armar_objetos (solo CatalogFile y Usage)
            no → generar_metadata → ¿metadata válida?
                   no → marcar_ilegible → armar_objetos
                   sí → proponer_respaldos → armar_objetos
 ```
 
+La identidad se resuelve antes de decidir por la legibilidad: el `contentHash` lo calcula el core
+sobre los bytes del archivo, así que identificar no exige haberlo podido leer.
+
 - Un **contenido** es un grupo de archivos con el mismo `contentHash`: se procesa una vez y
   genera un elemento con un uso por archivo.
 - Un archivo **ilegible** nunca es un error: sale como `CatalogFile` en estado `Unreadable` y
-  como una fila del reporte con su motivo.
+  como una fila del reporte con su motivo. Siempre queda asociado a un elemento, como exige el
+  mod: el que ya existía si su hash se conoce, o uno nuevo **sin describir** (solo el título del
+  LMS y el tipo según el formato, con Provenance `Lms`, en `Detected` y con `metadataStatus` en
+  false), con su uso en el curso dictado. Es el patrón de los datos de ejemplo del mod, y lo que
+  permite que la plataforma cree la tarea `UnreadableFile` sobre un archivo que pertenece a un
+  contenido (LAB-40).
 - **Nada nace validado** y ningún campo de profesor o curador se llena.
 
 ## Pruebas
