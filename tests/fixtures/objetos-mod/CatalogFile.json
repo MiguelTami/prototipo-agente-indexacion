@@ -69,7 +69,7 @@
       "description": "How learningElementId was determined: exact hash match, or similarity of extracted text / semantic representation when there is no exact hash match."
     },
     "identificationConfidence": {
-      "type": "number",
+      "type": "float",
       "title": "Identification Confidence",
       "not_null": false,
       "description": "Confidence of the match (0-1) when the method is not exact hash. Below a threshold, the identification stays proposed and pending curator confirmation."

@@ -6,7 +6,7 @@ cambia, se reemplaza la copia y los tests muestran qué hay que actualizar en el
 
 | Archivo | Origen | Rama | Último commit del origen |
 | --- | --- | --- | --- |
-| `CatalogFile.json`, `LearningElement.json`, `Backing.json`, `Usage.json`, `Provenance.json` | `up1/mods/learning-catalog/objects/` | `fix/catalog-gaps` | `ee19ed8` (2026-09-25) |
+| `CatalogFile.json`, `LearningElement.json`, `Backing.json`, `Usage.json`, `Provenance.json` | `up1/mods/learning-catalog/objects/` | `integration/develop-candidate` | `a12289d` (2026-10-02) |
 | `rt__LearningOutcome__curricularsection.json` | `up1/mods/curriculum-design/objects/RecordTypes/` | `develop` | `117d8ba` (2026-04-29) |
 
 El prototipo no importa nada de `up1`: esta copia es la única relación con el mod, y es solo

@@ -10,7 +10,9 @@
     "defaultLayoutType": "RecordList",
     "indexes": [
       "entityType",
-      "entityId"
+      "entityId",
+      "actorId",
+      "actorSegmentId"
     ],
     "uniqueConstraints": [
       [

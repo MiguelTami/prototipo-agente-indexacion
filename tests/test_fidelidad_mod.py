@@ -31,7 +31,7 @@ EXCEPCIONES_OBLIGATORIEDAD = {
     ("CatalogFile", "identificationMethod"): "un archivo ilegible no tiene identidad resuelta",
 }
 
-TIPOS_JSON = {"string": str, "number": float, "integer": int, "boolean": bool, "array": list}
+TIPOS_JSON = {"string": str, "number": float, "float": float, "integer": int, "boolean": bool, "array": list}
 
 
 def _definicion(nombre: str) -> dict:

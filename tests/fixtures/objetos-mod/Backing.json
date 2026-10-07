@@ -11,7 +11,8 @@
     "indexes": [
       "learningElementId",
       "courseId",
-      "learningOutcomeId"
+      "learningOutcomeId",
+      "validatedById"
     ],
     "uniqueConstraints": [
       [
@@ -75,7 +76,7 @@
       "description": "Cognitive level the object actually offers for this outcome in this course. Not a copy of the element's general cognitiveLevel; the main metric compares the outcome's required level against this field."
     },
     "modelConfidence": {
-      "type": "number",
+      "type": "float",
       "title": "Model Confidence",
       "not_null": false,
       "description": "Confidence (0-1) of the AI model when proposing this backing. Below a threshold (defined in logic/), the backing enters the curator queue as LowConfidenceBacking. This is the AI half of the backing's confidence; the professor half is not stored here, it is derived from whether a BackingJudgment with decision=Confirm exists for this backing."
@@ -89,7 +90,26 @@
         "Validated"
       ],
       "static_default": "Proposed",
-      "description": "Validated requires prior usage of the object in that course."
+      "description": "Validated requires prior usage of the object in that course, enforced by the transition guard: the Proposed -> Validated transition carries the condition proposedWithoutUsage == false (F2). The way back exists because FLOW-08 raises a Conflict task when a professor reconsiders a judgement on a backing that may already be validated, and F4 lets the curator decide the status directly. Both moves require mod/learning-catalog:task.resolve, the capability of completing a curator flow, which is a different thing from being allowed to edit the field.",
+      "transitions": [
+        {
+          "from": "Proposed",
+          "to": "Validated",
+          "conditions": "proposedWithoutUsage == false",
+          "message": "No se puede validar un respaldo propuesto sin uso previo del elemento en ese curso: primero tiene que existir el Uso.",
+          "messageKey": "Backing.transitions.validatedRequiresUsage",
+          "requiredCapabilities": [
+            "mod/learning-catalog:task.resolve"
+          ]
+        },
+        {
+          "from": "Validated",
+          "to": "Proposed",
+          "requiredCapabilities": [
+            "mod/learning-catalog:task.resolve"
+          ]
+        }
+      ]
     },
     "proposedWithoutUsage": {
       "type": "boolean",
