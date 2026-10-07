@@ -58,22 +58,55 @@ def test_la_corrida_termina_y_reporta_los_ilegibles(carpeta_lote, tmp_path):
     ilegibles = {f.sourceIdentifier: f for f in reporte.archivos if f.estado == "ilegible"}
     assert set(ilegibles) == ILEGIBLES
     assert all(f.motivo for f in ilegibles.values())
-    assert all(f.pasos == ["revisar_legibilidad", "marcar_ilegible", "armar_objetos"] for f in ilegibles.values())
+    pasos = ["revisar_legibilidad", "resolver_identidad", "marcar_ilegible", "armar_objetos"]
+    assert all(f.pasos == pasos for f in ilegibles.values())
     assert reporte.totales.archivosIlegibles == 3
 
     texto = (resultado.carpeta / "reporte.md").read_text(encoding="utf-8")
     assert all(f.motivo in texto for f in ilegibles.values())
 
 
-def test_cada_ilegible_sale_como_catalog_file_unreadable(carpeta_lote, tmp_path):
+def test_cada_ilegible_sale_como_catalog_file_unreadable_con_su_elemento(carpeta_lote, tmp_path):
+    """LAB-40: identificado por hash antes de marcarlo, nunca queda sin elemento (el mod lo exige)."""
     resultado = indexar(carpeta_lote, tmp_path)
     archivos = {f.sourceIdentifier: f for f in resultado.reporte.archivos}
-    for source_identifier in ILEGIBLES:
-        assert archivos[source_identifier].objetos == {"catalogFiles": [f"cf-{source_identifier}"]}
-    catalog_files = json.loads((resultado.carpeta / "objetos" / "catalog_files.json").read_text(encoding="utf-8"))
+    leer = lambda nombre: json.loads((resultado.carpeta / "objetos" / nombre).read_text(encoding="utf-8"))
+    catalog_files, elementos, usos = leer("catalog_files.json"), leer("learning_elements.json"), leer("usages.json")
+    elementos_por_id = {e["id"]: e for e in elementos}
+
     ilegibles = [c for c in catalog_files if c["detectionExtractionStatus"] == "Unreadable"]
     assert {c["sourceIdentifier"] for c in ilegibles} == ILEGIBLES
-    assert all(c["learningElementId"] is None for c in ilegibles)
+    for c in ilegibles:
+        assert c["learningElementId"] and c["identificationMethod"] == "ExactHash"
+        assert c["identificationPending"] is False
+        objetos = archivos[c["sourceIdentifier"]].objetos
+        assert objetos["catalogFiles"] == [c["id"]]
+        assert objetos["usages"] == [f"us-{c['sourceIdentifier']}"]
+        assert any(u["learningElementId"] == c["learningElementId"] for u in usos)
+
+
+def test_un_contenido_ilegible_nuevo_nace_como_elemento_sin_describir(carpeta_lote, tmp_path):
+    """El patrón de los datos de ejemplo del mod: el contenido existe, sin describir, y el archivo
+    ilegible se le cuelga. Solo lleva lo que se sabe sin leerlo, con Provenance Lms."""
+    resultado = indexar(carpeta_lote, tmp_path)
+    leer = lambda nombre: json.loads((resultado.carpeta / "objetos" / nombre).read_text(encoding="utf-8"))
+    catalog_files, elementos = leer("catalog_files.json"), leer("learning_elements.json")
+    provenance = {(p["entityId"], p["fieldName"]): p for p in leer("provenance.json")}
+    archivos = {f.sourceIdentifier: f for f in resultado.reporte.archivos}
+
+    ids = {c["learningElementId"] for c in catalog_files if c["detectionExtractionStatus"] == "Unreadable"}
+    sin_describir = [e for e in elementos if e["id"] in ids]
+    assert sin_describir, "algún ilegible del lote es contenido nuevo"
+    for e in sin_describir:
+        assert e["ingestionStatus"] == "Detected" and e["metadataStatus"] is False
+        assert e["estimatedTime"] == 0 and e["description"] is None and e["cognitiveLevel"] is None
+        assert e["extractedTextUrl"] is None and e["keywords"] == []
+        titulos = {f.tituloLms for f in resultado.reporte.archivos if f.learningElementId == e["id"]}
+        assert e["descriptiveTitle"] in titulos
+        assert provenance[(e["id"], "descriptiveTitle")]["origin"] == "Lms"
+        assert provenance[(e["id"], "type")]["origin"] == "Lms"
+        assert (e["id"], "description") not in provenance
+    assert all(archivos[s].learningElementId for s in ILEGIBLES)
 
 
 def test_ninguna_otra_ruta_llega_a_marcar_ilegible(carpeta_lote, tmp_path):

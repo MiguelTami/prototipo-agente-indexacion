@@ -4,9 +4,10 @@ Nombres de campo, valores permitidos y obligatoriedad copiados de los objetos re
 (rama fix/catalog-gaps). Cada objeto lleva además un `id` local: el prototipo no tiene base de
 datos, así que los ids son estables pero no son los que asignaría Object Manager.
 
-Diferencias deliberadas con el mod, documentadas como huecos del modelo en el plan:
-- CatalogFile.learningElementId e identificationMethod son obligatorios en el mod, pero un
-  archivo ilegible no tiene elemento ni identidad resuelta. Aquí son opcionales.
+Sin diferencias de obligatoriedad con el mod. Hasta LAB-40, CatalogFile.learningElementId e
+identificationMethod eran opcionales aquí porque un archivo ilegible salía sin elemento; ahora el
+agente lo identifica por hash antes de marcarlo ilegible y le asocia un elemento, así que son
+obligatorios, como en el mod.
 """
 
 from __future__ import annotations
@@ -46,11 +47,9 @@ class CatalogFile(_Objeto):
     fileType: FileType
     sourceUrl: Optional[str] = None
     offeringId: Optional[str] = None
-    learningElementId: Optional[str] = Field(default=None, description="Vacío solo si es ilegible.")
+    learningElementId: str
     contentHash: Optional[str] = None
-    identificationMethod: Optional[IdentificationMethod] = Field(
-        default=None, description="Vacío solo si es ilegible."
-    )
+    identificationMethod: IdentificationMethod
     identificationConfidence: Optional[float] = Field(default=None, ge=0, le=1)
     identificationPending: bool = False
     detectionExtractionStatus: DetectionExtractionStatus

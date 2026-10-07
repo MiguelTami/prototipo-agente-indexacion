@@ -62,7 +62,8 @@ def construir_reporte(estado: EstadoLote) -> Reporte:
                     tituloLms=archivo.tituloLms,
                     contentHash=archivo.core.contentHash,
                     estado=_estado_archivo(resultado),
-                    learningElementId=resultado.get("learningElementId") if resultado["legible"] else None,
+                    # Desde LAB-40 un ilegible tambien queda identificado y asociado a su elemento.
+                    learningElementId=resultado.get("learningElementId"),
                     motivo=resultado["motivo"],
                     advertencias=resultado["advertencias"],
                     pasos=resultado["pasos"],

@@ -49,6 +49,11 @@ CAMPOS_AGENTE_ELEMENTO = (
     "cognitiveLevel",
 )
 CAMPOS_LMS_USAGE = ("offeringId", "weekOrUnit", "order")
+# Lo único que se sabe de un contenido sin haberlo leído: viene del LMS.
+CAMPOS_LMS_ELEMENTO_SIN_DESCRIBIR = ("descriptiveTitle", "type")
+# Idioma de un contenido que no se pudo leer, cuando el curso tampoco lo declara. El elemento sale
+# con metadataStatus en false, así que el Curador lo revisa de todas formas.
+IDIOMA_POR_DEFECTO = "es"
 CAMPOS_AGENTE_BACKING = ("learningOutcomeId", "character", "offeredCognitiveLevel", "modelConfidence")
 
 
@@ -72,8 +77,16 @@ def id_backing(learning_element_id: str, codigo_ra: str) -> str:
 # --- CatalogFile ----------------------------------------------------------------------------
 
 
-def catalog_file_ilegible(archivo: ArchivoEntrada, offering_id: str, ahora: str) -> CatalogFile:
-    """CatalogFile de un archivo que no se pudo leer: sin elemento ni identidad resuelta."""
+def catalog_file_ilegible(
+    archivo: ArchivoEntrada, learning_element_id: str, offering_id: str, ahora: str
+) -> CatalogFile:
+    """CatalogFile de un archivo que no se pudo leer, ya identificado por hash exacto.
+
+    Que no se pueda leer no impide identificarlo: el contentHash lo calcula el core sobre los bytes
+    del archivo, antes del agente. Así el archivo apunta siempre a un elemento, como exige el mod
+    (CatalogFile.learningElementId es obligatorio), y la tarea UnreadableFile llega sobre un archivo
+    que ya pertenece a un contenido (LAB-40).
+    """
     return CatalogFile(
         id=id_catalog_file(archivo),
         sourceSystem="Lms",
@@ -81,7 +94,10 @@ def catalog_file_ilegible(archivo: ArchivoEntrada, offering_id: str, ahora: str)
         fileType=archivo.fileType,
         sourceUrl=archivo.sourceUrl,
         offeringId=offering_id,
+        learningElementId=learning_element_id,
         contentHash=archivo.core.contentHash,
+        identificationMethod="ExactHash",
+        identificationPending=False,
         detectionExtractionStatus="Unreadable",
         sourceVersion=archivo.sourceVersion,
         detectedAt=ahora,
@@ -125,6 +141,30 @@ def metadata_completa(elemento: LearningElement) -> bool:
             elemento.language.strip(),
             elemento.rights,
         ]
+    )
+
+
+def elemento_sin_describir(
+    learning_element_id: str, archivo: ArchivoEntrada, contexto: ContextoCurso
+) -> LearningElement:
+    """LearningElement mínimo de un contenido que no se pudo leer (LAB-40).
+
+    Es el patrón que el mod ya usa en sus datos de ejemplo (seed/_data-catalog-core.js y
+    seed/_data-metrics-demo.js): el contenido existe, sin describir, y su archivo ilegible se le
+    cuelga. Lleva solo lo que se sabe sin leerlo: el título con que aparece en el LMS y el tipo
+    según el formato, los dos con Provenance de origen Lms, y el idioma del curso. Queda en
+    Detected y con metadataStatus en false: incompleto frente al contrato de salida, que es lo que
+    es. El título del LMS no es un descriptiveTitle generado: lo dice su Provenance, y el Curador
+    lo reemplaza al resolver la tarea del archivo.
+    """
+    return LearningElement(
+        id=learning_element_id,
+        descriptiveTitle=archivo.tituloLms,
+        type=TIPO_POR_FORMATO[archivo.fileType],
+        language=contexto.curso.language or IDIOMA_POR_DEFECTO,
+        estimatedTime=0,
+        ingestionStatus="Detected",
+        metadataStatus=False,
     )
 
 

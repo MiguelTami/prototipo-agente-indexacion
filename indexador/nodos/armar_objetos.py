@@ -1,6 +1,7 @@
 """Nodo armar_objetos: convierte lo que decidieron los nodos anteriores en objetos del mod.
 
-- Ilegible: conserva el CatalogFile Unreadable que armó marcar_ilegible.
+- Ilegible: conserva lo que armó marcar_ilegible (CatalogFile Unreadable ya asociado a su
+  elemento, su Usage y, si el elemento es nuevo, el elemento sin describir).
 - Vinculado a un elemento existente: un CatalogFile y un Usage por archivo, sin tocar el elemento.
 - Elemento nuevo: el LearningElement, un CatalogFile y un Usage por archivo (un elemento, muchos
   usos), los Backing propuestos y el markdown que irá a S3.

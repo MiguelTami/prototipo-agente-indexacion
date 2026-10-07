@@ -25,11 +25,10 @@ MODELOS = {
 }
 
 # Campos obligatorios en el mod que el prototipo deja opcionales a propósito.
-# Cada uno es un hueco del modelo documentado en el plan.
-EXCEPCIONES_OBLIGATORIEDAD = {
-    ("CatalogFile", "learningElementId"): "un archivo ilegible no tiene elemento",
-    ("CatalogFile", "identificationMethod"): "un archivo ilegible no tiene identidad resuelta",
-}
+# Cada uno es un hueco del modelo documentado en el plan. Vacío desde LAB-40: los dos que había,
+# CatalogFile.learningElementId e identificationMethod, existían porque un archivo ilegible salía
+# sin elemento; ahora se identifica por hash antes de marcarlo ilegible.
+EXCEPCIONES_OBLIGATORIEDAD: dict[tuple[str, str], str] = {}
 
 TIPOS_JSON = {"string": str, "number": float, "float": float, "integer": int, "boolean": bool, "array": list}
 

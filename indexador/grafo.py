@@ -5,14 +5,18 @@ Grafo del lote:
           → consolidar_lote → escribir_salidas → generar_reporte → END
 
 Subgrafo de un contenido:
-    START → revisar_legibilidad → ¿legible?
-              sí → resolver_identidad → ¿elemento nuevo?
+    START → revisar_legibilidad → resolver_identidad → ¿legible?
+              no → marcar_ilegible → armar_objetos
+              sí → ¿elemento nuevo?
                      sí → generar_metadata → ¿metadata válida?
                             sí → proponer_respaldos → armar_objetos
                             no (el modelo falló tras los reintentos) → marcar_ilegible
                      no (ya está en el catálogo) → armar_objetos
-              no → marcar_ilegible → armar_objetos
           → END
+
+La identidad se resuelve antes de decidir por la legibilidad (LAB-40): el contentHash lo calcula
+el core sobre los bytes del archivo, así que identificar no exige haberlo podido leer. Un archivo
+ilegible queda así siempre asociado a un elemento, como exige el mod.
 """
 
 from __future__ import annotations
@@ -34,11 +38,9 @@ from indexador.nodos.revisar_legibilidad import revisar_legibilidad
 from indexador.traza import resumir_salida
 
 
-def es_legible(estado: EstadoContenido) -> str:
-    return "resolver_identidad" if estado.get("legible", True) else "marcar_ilegible"
-
-
-def es_nuevo(estado: EstadoContenido) -> str:
+def tras_identidad(estado: EstadoContenido) -> str:
+    if not estado.get("legible", True):
+        return "marcar_ilegible"
     return "armar_objetos" if estado.get("elementoExistente") else "generar_metadata"
 
 
@@ -55,8 +57,8 @@ def construir_subgrafo_contenido():
     g.add_node("marcar_ilegible", marcar_ilegible)
     g.add_node("armar_objetos", armar_objetos)
     g.add_edge(START, "revisar_legibilidad")
-    g.add_conditional_edges("revisar_legibilidad", es_legible, ["resolver_identidad", "marcar_ilegible"])
-    g.add_conditional_edges("resolver_identidad", es_nuevo, ["generar_metadata", "armar_objetos"])
+    g.add_edge("revisar_legibilidad", "resolver_identidad")
+    g.add_conditional_edges("resolver_identidad", tras_identidad, ["generar_metadata", "armar_objetos", "marcar_ilegible"])
     g.add_conditional_edges("generar_metadata", tiene_metadata, ["proponer_respaldos", "marcar_ilegible"])
     g.add_edge("proponer_respaldos", "armar_objetos")
     g.add_edge("marcar_ilegible", "armar_objetos")

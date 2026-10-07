@@ -48,8 +48,11 @@ def test_las_salidas_validan_contra_los_esquemas(corrida):
 # Criterio 3: metadata y objetos completos.
 def test_cada_elemento_nuevo_tiene_su_metadata_y_su_markdown(corrida):
     resultado, objetos = corrida
-    elementos = objetos["learning_elements.json"]
+    # Los que nacen de un contenido ilegible quedan en Detected, sin describir (LAB-40): se prueban
+    # en test_legibilidad.py.
+    elementos = [e for e in objetos["learning_elements.json"] if e.ingestionStatus != "Detected"]
     assert len(elementos) == 9
+    assert len(objetos["learning_elements.json"]) == 12
     for elemento in elementos:
         assert elemento.metadataStatus, elemento.id
         assert elemento.cognitiveLevel and elemento.knowledgeType and elemento.keywords
@@ -91,6 +94,10 @@ def test_cada_campo_del_agente_tiene_su_provenance(corrida):
     _, objetos = corrida
     registrados = {(p.entityId, p.fieldName): p for p in objetos["provenance.json"]}
     for elemento in objetos["learning_elements.json"]:
+        if elemento.ingestionStatus == "Detected":
+            # Sin describir (LAB-40): su título viene del LMS, no del agente.
+            assert registrados[(elemento.id, "descriptiveTitle")].origin == "Lms"
+            continue
         for campo in ("descriptiveTitle", "description", "keywords", "cognitiveLevel", "knowledgeType", "language", "estimatedTime"):
             p = registrados[(elemento.id, campo)]
             assert p.origin == "AiAgent" and p.configVersion and "simulado@1" in p.agentIdentifier

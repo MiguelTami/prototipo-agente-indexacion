@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+
 import pytest
 
 from indexador import indexar
@@ -87,12 +89,16 @@ class _ModeloConRaAjeno(ModeloSimulado):
 
 def test_si_el_modelo_falla_el_contenido_sale_ilegible_y_la_corrida_sigue(carpeta_lote, tmp_path, monkeypatch):
     monkeypatch.setattr("indexador.nodos.generar_metadata.obtener_modelo", lambda config: _ModeloQueFalla())
-    reporte = indexar(carpeta_lote, tmp_path).reporte
+    resultado = indexar(carpeta_lote, tmp_path)
+    reporte = resultado.reporte
 
     fallidos = [f for f in reporte.archivos if f.pasos[-2:] == ["marcar_ilegible", "armar_objetos"] and "generar_metadata" in f.pasos]
     assert len(fallidos) == 10, "los 10 archivos con elemento nuevo pasan por el modelo"
     assert all(f.estado == "ilegible" and "3 intentos" in f.motivo for f in fallidos)
-    assert reporte.totales.learningElements == 0
+    # LAB-40: cada contenido nuevo sale igual, como elemento sin describir. Ninguno trae metadata.
+    elementos = json.loads((resultado.carpeta / "objetos" / "learning_elements.json").read_text(encoding="utf-8"))
+    assert reporte.totales.learningElements == len(elementos) == 12
+    assert all(e["ingestionStatus"] == "Detected" and e["metadataStatus"] is False for e in elementos)
 
 
 def test_los_ra_ajenos_al_curso_se_descartan(carpeta_lote, tmp_path, monkeypatch):

@@ -62,5 +62,8 @@ def test_forma_de_los_grafos():
     lote = GRAFO_LOTE.get_graph()
     assert {"cargar_lote", "procesar_contenido", "consolidar_lote", "escribir_salidas", "generar_reporte"} <= set(lote.nodes)
     contenido = SUBGRAFO_CONTENIDO.get_graph()
+    # LAB-40: la identidad se resuelve antes de decidir por la legibilidad.
     destinos = {e.target for e in contenido.edges if e.source == "revisar_legibilidad"}
-    assert destinos == {"resolver_identidad", "marcar_ilegible"}
+    assert destinos == {"resolver_identidad"}
+    destinos = {e.target for e in contenido.edges if e.source == "resolver_identidad"}
+    assert destinos == {"generar_metadata", "armar_objetos", "marcar_ilegible"}
