@@ -126,7 +126,21 @@ salida/<runId>/
   reporte.md                       para personas: totales, ilegibles, razones de los respaldos
   traza.json, traza.md             con --trazar: lo que devolvió cada nodo
   evaluacion.json, evaluacion.md   con --evaluar: acuerdo con las respuestas esperadas
+  exportacion.json                 con indexador.exportar: la corrida lista para un seed de uP1
 ```
+
+### Exportar una corrida para un seed de uP1
+
+```bash
+python -m indexador.exportar --corrida salida/<runId> --entrada lotes-reales/mi-curso
+```
+
+Escribe `exportacion.json` en la carpeta de la corrida (o donde diga `--salida`): los cinco objetos
+con los valores del agente y el contexto del curso (nombre, curso dictado y RA). Los ids locales
+quedan como `ref` para unir los objetos entre sí; `courseId` y `offeringId` se quitan, porque el
+seed los pone con los ids reales; el RA se nombra por su código (`learningOutcomeCode`), y un
+elemento que ya estaba en el catálogo, por su `contentHash` (`existingElementContentHash`).
+`extractedTextUrl` sale vacío, porque en la corrida es una ruta local.
 
 ### Modo del modelo
 
@@ -196,6 +210,7 @@ indexador/
   objetos.py          construcción de objetos y proveniencia
   llm.py              modelo simulado y Amazon Bedrock
   preparar.py         arma un lote desde una carpeta de PDF
+  exportar.py         lleva una corrida a un JSON para un seed de uP1
   traza.py            traza nodo por nodo
   evaluacion.py       acuerdo con las respuestas esperadas
   prompts/            prompts del modelo real
