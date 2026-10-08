@@ -51,7 +51,9 @@ def test_la_terminal_hace_lo_mismo_que_la_funcion(carpeta_lote, tmp_path):
     salida = subprocess.run(
         [sys.executable, "-m", "indexador", "--entrada", str(carpeta_lote), "--salida", str(tmp_path)],
         capture_output=True,
-        text=True,
+        # La terminal escribe en UTF-8 (__main__.py reconfigura stdout); sin decirlo, Windows
+        # decodifica con cp1252 y la "ú" no coincide.
+        encoding="utf-8",
         check=True,
     )
     assert "14 archivos, 13 contenidos únicos" in salida.stdout
