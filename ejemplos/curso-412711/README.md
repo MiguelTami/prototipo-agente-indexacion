@@ -19,7 +19,7 @@ Todos los archivos están marcados con `sintetico: true` en `lote.json`.
 
 | Archivo | Caso | Resultado esperado |
 | --- | --- | --- |
-| 4542265 y sim-0001 | Mismo contenido en dos módulos | Un elemento con dos usos |
+| 4542265 y sim-0001 | Mismo contenido en dos módulos | Un elemento con dos archivos y un uso, el del primer módulo |
 | 4542268 | Ya existe en `contexto/catalogo.json` | Se vincula al elemento conocido |
 | 4542267 | HTML sin conversor en el core (`unsupported`) | Ilegible, con motivo, asociado a un elemento sin describir |
 | 4542281 | Archivo corrupto (`failed`) | Ilegible, con motivo, asociado a un elemento sin describir |

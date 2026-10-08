@@ -119,7 +119,7 @@ salida/<runId>/
   objetos/catalog_files.json       un CatalogFile por archivo, Unreadable si no se pudo leer
   objetos/learning_elements.json   un elemento por contenido nuevo (sin describir si no se pudo leer)
   objetos/backings.json            respaldos propuestos (siempre Proposed)
-  objetos/usages.json              un uso por archivo, legible o no
+  objetos/usages.json              un uso por contenido en el curso dictado, legible o no
   objetos/provenance.json          de dónde sale cada campo: AiAgent o Lms
   markdown/<elemento>.md           contenido extraído con su metadata, el que irá a S3
   reporte.json                     para máquinas
@@ -187,7 +187,9 @@ La identidad se resuelve antes de decidir por la legibilidad: el `contentHash` l
 sobre los bytes del archivo, así que identificar no exige haberlo podido leer.
 
 - Un **contenido** es un grupo de archivos con el mismo `contentHash`: se procesa una vez y
-  genera un elemento con un uso por archivo.
+  genera un elemento, un `CatalogFile` por archivo y **un solo uso** en el curso dictado, el del
+  primer archivo en el orden del curso. El mod admite un uso por elemento y curso dictado: el mismo
+  contenido en dos módulos tiene dos archivos y un uso.
 - Un archivo **ilegible** nunca es un error: sale como `CatalogFile` en estado `Unreadable` y
   como una fila del reporte con su motivo. Siempre queda asociado a un elemento, como exige el
   mod: el que ya existía si su hash se conoce, o uno nuevo **sin describir** (solo el título del
