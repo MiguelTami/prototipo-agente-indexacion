@@ -154,7 +154,10 @@ def elemento_sin_describir(
     cuelga. Lleva solo lo que se sabe sin leerlo: el título con que aparece en el LMS y el tipo
     según el formato, los dos con Provenance de origen Lms, y el idioma del curso. Queda en
     Detected y con metadataStatus en false: incompleto frente al contrato de salida, que es lo que
-    es. El título del LMS no es un descriptiveTitle generado: lo dice su Provenance, y el Curador
+    es. `language` (el del curso, o IDIOMA_POR_DEFECTO) y `estimatedTime = 0` los exige el mod como
+    obligatorios y no llevan Provenance: no hay un origen del mod para un valor por defecto, el mismo
+    hueco que rights o validityStatus (ver la cabecera). El Curador los revisa igual, porque el
+    elemento queda incompleto. El título del LMS no es un descriptiveTitle generado: lo dice su Provenance, y el Curador
     lo reemplaza al resolver la tarea del archivo.
     """
     return LearningElement(
@@ -214,8 +217,9 @@ def usage(archivo: ArchivoEntrada, learning_element_id: str, offering_id: str) -
 def archivo_del_uso(archivos: list[ArchivoEntrada]) -> ArchivoEntrada:
     """El archivo que da semana y orden al único Usage de un contenido en el curso dictado.
 
-    Es el primero en el orden del lote, que es el orden natural del curso (Semana 2 antes que
-    Semana 10). Los demás archivos del mismo contenido quedan como CatalogFile, cada uno con su
+    Es el primero en el orden del manifiesto (lote.json), que cargar_lote conserva al agrupar.
+    `preparar` escribe el manifiesto en el orden natural del curso (Semana 2 antes que Semana 10);
+    un lote escrito a mano tiene que venir en ese orden para que el uso sea el del primer módulo. Los demás archivos del mismo contenido quedan como CatalogFile, cada uno con su
     proveniencia, pero sin Usage propio: el modelo del mod admite uno por elemento y curso dictado,
     y una segunda fila la rechazaría la base (LAB-40).
     """
