@@ -283,11 +283,12 @@ class ModeloBedrock(_ModeloLangChain):
     """Amazon Bedrock vía langchain-aws. Credenciales: las de AWS del entorno (perfil o SSO)."""
 
     def __init__(self, config: Config):
+        # La configuración primero: un llm.modelo vacío es un error del usuario con o sin el extra.
+        modelo = _exigir_modelo(config)
         try:
             from langchain_aws import ChatBedrockConverse
         except ImportError as error:  # pragma: no cover - depende de la instalación
             raise ErrorModelo('Falta langchain-aws: pip install -e ".[bedrock]"') from error
-        modelo = _exigir_modelo(config)
         chat = ChatBedrockConverse(model=modelo, region_name=config.llm.region, temperature=config.llm.temperatura)
         super().__init__(chat, f"bedrock/{modelo}", config)
 
@@ -296,11 +297,11 @@ class ModeloGemini(_ModeloLangChain):
     """Gemini en Google AI Studio vía langchain-google-genai. Llave: GOOGLE_API_KEY o GEMINI_API_KEY."""
 
     def __init__(self, config: Config):
+        modelo = _exigir_modelo(config)
         try:
             from langchain_google_genai import ChatGoogleGenerativeAI
         except ImportError as error:  # pragma: no cover - depende de la instalación
             raise ErrorModelo('Falta langchain-google-genai: pip install -e ".[gemini]"') from error
-        modelo = _exigir_modelo(config)
         llave = os.environ.get("GOOGLE_API_KEY") or os.environ.get("GEMINI_API_KEY")
         if not llave:
             raise ErrorModelo("Falta la llave de Gemini: define GOOGLE_API_KEY en el archivo .env (ver .env.example)")
