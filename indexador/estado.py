@@ -1,8 +1,9 @@
 """Estado de los dos grafos: el del lote y el de cada contenido.
 
 Un "contenido" es un grupo de archivos del lote con el mismo contentHash: se procesa una sola
-vez y genera un elemento con un uso por archivo (un archivo en 40 secciones es un elemento con
-40 usos).
+vez y genera un elemento, un CatalogFile por archivo y un solo uso en el curso dictado del lote:
+el mod admite un uso por elemento y curso dictado (LAB-40). El mismo archivo en 40 cursos
+dictados son 40 lotes, y por eso 40 usos de un mismo elemento.
 """
 
 from __future__ import annotations

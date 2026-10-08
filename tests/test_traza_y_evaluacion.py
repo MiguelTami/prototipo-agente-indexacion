@@ -36,7 +36,8 @@ def test_la_traza_muestra_lo_que_devolvio_cada_nodo(carpeta_lote, tmp_path):
     assert salidas["revisar_legibilidad"]["markdown"].endswith("caracteres>"), "el markdown se resume"
     assert salidas["generar_metadata"]["metadata"]["language"] == "es"
     assert len(salidas["proponer_respaldos"]["juicios"]) == 3
-    assert salidas["armar_objetos"]["objetos"]["usages"] == ["us-4542265", "us-sim-0001"]
+    # Un solo Usage por contenido y curso dictado, el del primer archivo (LAB-40).
+    assert salidas["armar_objetos"]["objetos"]["usages"] == ["us-4542265"]
     assert "Programa de curso" in (resultado.carpeta / "traza.md").read_text(encoding="utf-8")
 
 

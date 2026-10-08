@@ -4,8 +4,9 @@
 queda en la salida y en el reporte con su motivo, y la corrida sigue.
 
 Desde LAB-40 el contenido llega ya identificado (resolver_identidad corre antes), así que cada
-archivo sale como CatalogFile Unreadable asociado a su elemento, con su Usage en el curso dictado,
-que es dato del LMS y no depende de haber leído nada. Si el elemento no existía, nace uno sin
+archivo sale como CatalogFile Unreadable asociado a su elemento, y el contenido tiene su Usage en
+el curso dictado (uno por contenido, el del primer archivo), que es dato del LMS y no depende de
+haber leído nada. Si el elemento no existía, nace uno sin
 describir (objetos.elemento_sin_describir). Si ya existía, se vincula sin tocarlo, igual que un
 archivo legible.
 """
@@ -17,6 +18,7 @@ from indexador.estado import EstadoContenido
 from indexador.objetos import (
     CAMPOS_LMS_ELEMENTO_SIN_DESCRIBIR,
     CAMPOS_LMS_USAGE,
+    archivo_del_uso,
     catalog_file_ilegible,
     elemento_sin_describir,
     provenance,
@@ -35,11 +37,11 @@ def marcar_ilegible(estado: EstadoContenido) -> dict:
 
     for archivo in archivos_lms:
         cf = catalog_file_ilegible(archivo, le_id, offering_id, ahora)
-        uso = usage(archivo, le_id, offering_id)
         objetos.catalogFiles.append(cf)
-        objetos.usages.append(uso)
         objetos.provenance += provenance_catalog_file(cf, ahora, config)
-        objetos.provenance += provenance(uso, "Usage", CAMPOS_LMS_USAGE, "Lms", ahora, config)
+    uso = usage(archivo_del_uso(archivos_lms), le_id, offering_id)
+    objetos.usages.append(uso)
+    objetos.provenance += provenance(uso, "Usage", CAMPOS_LMS_USAGE, "Lms", ahora, config)
 
     if not estado.get("elementoExistente"):
         elemento = elemento_sin_describir(le_id, archivos_lms[0], entrada.contexto)

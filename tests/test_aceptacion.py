@@ -64,11 +64,30 @@ def test_cada_elemento_nuevo_tiene_su_metadata_y_su_markdown(corrida):
         assert cuerpo.strip()
 
 
-def test_un_elemento_muchos_usos(corrida):
+def test_un_contenido_en_dos_modulos_tiene_un_solo_uso_en_el_curso_dictado(corrida):
+    """El mod exige Usage único por (learningElementId, offeringId) (LAB-40): el contenido que
+    aparece en dos módulos da dos CatalogFile y un solo Usage, el del primer módulo."""
     _, objetos = corrida
-    usos = [u for u in objetos["usages.json"] if u.id in {"us-4542265", "us-sim-0001"}]
-    assert len({u.learningElementId for u in usos}) == 1
-    assert {(u.weekOrUnit, u.order) for u in usos} == {("Presentación del curso", 1), ("Reto 1", 5)}
+    archivos = [c for c in objetos["catalog_files.json"] if c.sourceIdentifier in {"4542265", "sim-0001"}]
+    assert len(archivos) == 2 and len({c.learningElementId for c in archivos}) == 1
+    usos = [u for u in objetos["usages.json"] if u.learningElementId == archivos[0].learningElementId]
+    assert [(u.id, u.weekOrUnit, u.order) for u in usos] == [("us-4542265", "Presentación del curso", 1)]
+
+
+def test_la_salida_respeta_las_unicidades_del_mod(corrida):
+    """Cada uniqueConstraints de la copia fijada del mod se cumple en los objetos de la corrida."""
+    _, objetos = corrida
+    fixtures = Path(__file__).parent / "fixtures" / "objetos-mod"
+    archivos = {"Usage": "usages.json", "Backing": "backings.json", "Provenance": "provenance.json",
+                "CatalogFile": "catalog_files.json", "LearningElement": "learning_elements.json"}
+    revisadas = 0
+    for nombre, archivo in archivos.items():
+        definicion = json.loads((fixtures / f"{nombre}.json").read_text(encoding="utf-8"))
+        for campos in definicion.get("metadata", {}).get("uniqueConstraints", []):
+            claves = [tuple(getattr(o, c) for c in campos) for o in objetos[archivo]]
+            assert len(claves) == len(set(claves)), f"{nombre} repite {campos}"
+            revisadas += 1
+    assert revisadas >= 3
 
 
 def test_referencias_consistentes(corrida):

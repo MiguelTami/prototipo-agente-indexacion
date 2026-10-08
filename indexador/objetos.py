@@ -196,7 +196,12 @@ def learning_element(
 
 
 def usage(archivo: ArchivoEntrada, learning_element_id: str, offering_id: str) -> Usage:
-    """El elemento en el curso dictado, con semana y orden precargados desde el LMS."""
+    """El elemento en el curso dictado, con semana y orden precargados desde el LMS.
+
+    Uno por contenido y curso dictado, no uno por archivo: el mod exige Usage único por
+    (learningElementId, offeringId). Cuando el mismo contenido aparece en varios módulos del
+    curso, se toma el primero en el orden del lote (ver `archivo_del_uso`).
+    """
     return Usage(
         id=id_usage(archivo),
         learningElementId=learning_element_id,
@@ -204,6 +209,17 @@ def usage(archivo: ArchivoEntrada, learning_element_id: str, offering_id: str) -
         weekOrUnit=archivo.modulo,
         order=archivo.orden,
     )
+
+
+def archivo_del_uso(archivos: list[ArchivoEntrada]) -> ArchivoEntrada:
+    """El archivo que da semana y orden al único Usage de un contenido en el curso dictado.
+
+    Es el primero en el orden del lote, que es el orden natural del curso (Semana 2 antes que
+    Semana 10). Los demás archivos del mismo contenido quedan como CatalogFile, cada uno con su
+    proveniencia, pero sin Usage propio: el modelo del mod admite uno por elemento y curso dictado,
+    y una segunda fila la rechazaría la base (LAB-40).
+    """
+    return archivos[0]
 
 
 def backings(

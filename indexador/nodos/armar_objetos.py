@@ -2,9 +2,11 @@
 
 - Ilegible: conserva lo que armó marcar_ilegible (CatalogFile Unreadable ya asociado a su
   elemento, su Usage y, si el elemento es nuevo, el elemento sin describir).
-- Vinculado a un elemento existente: un CatalogFile y un Usage por archivo, sin tocar el elemento.
-- Elemento nuevo: el LearningElement, un CatalogFile y un Usage por archivo (un elemento, muchos
-  usos), los Backing propuestos y el markdown que irá a S3.
+- Vinculado a un elemento existente: un CatalogFile por archivo y un Usage en el curso dictado,
+  sin tocar el elemento.
+- Elemento nuevo: el LearningElement, un CatalogFile por archivo y un Usage en el curso dictado
+  (el mod admite uno por elemento y curso dictado: el del primer archivo, ver
+  objetos.archivo_del_uso), los Backing propuestos y el markdown que irá a S3.
 Todo campo que llena el agente o que viene del LMS lleva su Provenance.
 """
 
@@ -18,6 +20,7 @@ from indexador.objetos import (
     CAMPOS_AGENTE_BACKING,
     CAMPOS_AGENTE_ELEMENTO,
     CAMPOS_LMS_USAGE,
+    archivo_del_uso,
     backings,
     catalog_file_extraido,
     learning_element,
@@ -65,11 +68,11 @@ def armar_objetos(estado: EstadoContenido) -> dict:
 
     for archivo in archivos_lms:
         cf = catalog_file_extraido(archivo, le_id, offering_id, ahora)
-        uso = usage(archivo, le_id, offering_id)
         objetos.catalogFiles.append(cf)
-        objetos.usages.append(uso)
         objetos.provenance += provenance_catalog_file(cf, ahora, config, modelo)
-        objetos.provenance += provenance(uso, "Usage", CAMPOS_LMS_USAGE, "Lms", ahora, config)
+    uso = usage(archivo_del_uso(archivos_lms), le_id, offering_id)
+    objetos.usages.append(uso)
+    objetos.provenance += provenance(uso, "Usage", CAMPOS_LMS_USAGE, "Lms", ahora, config)
 
     salida = {"pasos": ["armar_objetos"], "objetos": objetos}
     if estado.get("elementoExistente"):
